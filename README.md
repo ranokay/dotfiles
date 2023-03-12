@@ -10,17 +10,14 @@ You can change the name of the repository to whatever you want when you clone it
 
 To install the dotfiles, clone this repository to your home directory and run the install script. The install script will create symbolic links from the dotfiles in this repository to your home directory. It will also prompt you to overwrite any existing dotfiles, so be careful. If you want to keep your existing dotfiles, you can copy the contents of the dotfiles in this repository into your existing dotfiles.
 
+You'll need to install at least one [Nerd Font](https://www.nerdfonts.com/font-downloads) to use the icons in the prompt. I recommend using `Fira Code Nerd Font` or `Caskaydia Cove Nerd Font`.
+
 ### Linux
 
-1. Clone the repository to your home directory:
+1. Clone the repository to your home directory and move to the linux directory:
 
    ```bash
    git clone https://github.com/ranokay/oxy-dotfiles.git
-   ```
-
-   Then, move to the oxy-dotfiles/linux directory:
-
-   ```bash
    cd oxy-dotfiles/linux
    ```
 
@@ -53,23 +50,17 @@ To install the dotfiles, clone this repository to your home directory and run th
 This script will also install the following packages if they are not already installed:
 
 - [Oh My Zsh](https://ohmyz.sh/)
-
-- [Nerd Fonts](https://www.nerdfonts.com/)
-
 - [Starship](https://starship.rs/)
-
 - [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
-
 - [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)
-
-You'll also need to install at least one [Nerd Font](https://www.nerdfonts.com/font-downloads) to use the icons in the prompt. I recommend using [Fira Code Nerd Font] or [Caskaydia Cove Nerd Font].
 
 ### Windows
 
-1. Clone the repository to your home directory:
+1. Clone the repository to your home directory and move to the windows directory:
 
    ```powershell
-   git clone
+   git clone https://github.com/ranokay/oxy-dotfiles.git
+   cd oxy-dotfiles/windows
    ```
 
    2. Run the install script:
@@ -82,6 +73,10 @@ You'll also need to install at least one [Nerd Font](https://www.nerdfonts.com/f
    ```powershell
     . $PROFILE
    ```
+
+This script will also install the following packages if they are not already installed:
+
+- [Starship](https://starship.rs/)
 
 ## Configuration
 
