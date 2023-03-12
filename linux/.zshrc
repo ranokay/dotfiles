@@ -18,6 +18,17 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting zsh-completions z zsh-i
 source $ZSH/oh-my-zsh.sh # Load the oh-my-zsh's library.
 
 alias ls="exa -abhl --icons --grid --color=always --group-directories-first"
+alias ll="exa -abhl --icons --grid --color=always --group-directories-first"
+alias la="exa -abhl --icons --grid --color=always --group-directories-first -a"
+alias l="exa -abhl --icons --grid --color=always --group-directories-first"
+
+alias c="clear"
+# alias g="git"
+alias gs="git status"
+alias gaa="git add ."
+alias gcm="git commit -m"
+alias gpull="git pull"
+alias gpush="git push"
 
 eval "$(starship init zsh)" # starship prompt
 
