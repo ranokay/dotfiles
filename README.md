@@ -2,33 +2,37 @@
 
 Dotfiles are hidden configuration files for command-line shells like bash, zsh, and PowerShell. They usually contain aliases, environment variables, and other custom settings that personalize your command-line experience.
 
-This repository contains my personal dotfiles for both Linux and Windows. Feel free to use them as a starting point for your own configuration.
+This repository contains my personal dotfiles for both Linux and Windows. Feel free to use them as a starting point for your own configuration. And the title Oxy is just a random name I came up with, it has nothing to do with configuration files. :smile:
+
+You can change the name of the repository to whatever you want when you clone it, but you'll need to update all the paths in the installation script. I recommend using the name `dotfiles` for consistency.
 
 ## Installation
 
 To install the dotfiles, clone this repository to your home directory and run the install script. The install script will create symbolic links from the dotfiles in this repository to your home directory. It will also prompt you to overwrite any existing dotfiles, so be careful. If you want to keep your existing dotfiles, you can copy the contents of the dotfiles in this repository into your existing dotfiles.
-
-This script will also install the following packages:
-
-- [Oh My Zsh](
-
-- [Nerd Fonts](https://www.nerdfonts.com/) (Cooming soon)
-
-- [Chocolatey](https://chocolatey.org/) (Windows only)
-
-- [Starship](https://starship.rs/) (Both Linux and Windows)
-
-- [zsh-autosuggestions](
 
 ### Linux
 
 1. Clone the repository to your home directory:
 
    ```bash
-   git clone
+   git clone https://github.com/ranokay/oxy-dotfiles.git
+   ```
+
+   Then, move to the oxy-dotfiles directory:
+
+   ```bash
+   cd oxy-dotfiles/linux
    ```
 
 2. Run the install script:
+
+   First, make the install script executable:
+
+   ```bash
+   chmod +x install.sh
+   ```
+
+   Then, run the install script:
 
    ```bash
    ./install.sh
@@ -38,6 +42,18 @@ This script will also install the following packages:
    ```bash
     source ~/.bashrc
    ```
+
+This script will also install the following packages:
+
+- [Oh My Zsh](https://ohmyz.sh/) (Linux only)
+
+- [Nerd Fonts](https://www.nerdfonts.com/) (Cooming soon)
+
+- [Chocolatey](https://chocolatey.org/) (Windows only)
+
+- [Starship](https://starship.rs/) (Both Linux and Windows)
+
+- [zsh-autosuggestions](
 
 ### Windows
 
@@ -77,6 +93,10 @@ You can customize your dotfiles by editing the files in the ~/oxy-dotfiles direc
 - Set environment variables in `powershell_env`.
 
 After making changes to your dotfiles, you'll need to reload your shell to see the changes take effect. You can do this by typing `. $PROFILE` depending on your shell.
+
+## Nix, flakes and home-manager
+
+Cooming soon.
 
 ## Disclaimer
 

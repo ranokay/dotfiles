@@ -74,11 +74,11 @@ if [ -f ~/.config/starship.toml ]; then
 fi
 
 # create symlinks
-ln -s ~/oxy-dotfiles/.gitconfig ~/.gitconfig
-ln -s ~/oxy-dotfiles/linux/.bashrc ~/.bashrc
-ln -s ~/oxy-dotfiles/linux/.zprofile ~/.zprofile
-ln -s ~/oxy-dotfiles/linux/.zshrc ~/.zshrc
-ln -s ~/oxy-dotfiles/.config/starship.toml ~/.config/starship.toml
+ln -s ~/*dotfiles/.gitconfig ~/.gitconfig
+ln -s ~/*dotfiles/linux/.bashrc ~/.bashrc
+ln -s ~/*dotfiles/linux/.zprofile ~/.zprofile
+ln -s ~/*dotfiles/linux/.zshrc ~/.zshrc
+ln -s ~/*dotfiles/.config/starship.toml ~/.config/starship.toml
 
 # Echo success message
 echo 'Successfully installed dotfiles'
