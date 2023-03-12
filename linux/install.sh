@@ -29,12 +29,15 @@ if ! [ -x "$(command -v starship)" ]; then
 	curl -fsSL https://starship.rs/install.sh | bash
 fi
 
-# create symlinks
-ln -sf ~/*dotfiles/.gitconfig ~/.gitconfig
-ln -sf ~/*dotfiles/linux/.bashrc ~/.bashrc
-ln -sf ~/*dotfiles/linux/.zprofile ~/.zprofile
-ln -sf ~/*dotfiles/linux/.zshrc ~/.zshrc
-ln -sf ~/*dotfiles/.config/starship.toml ~/.config/starship.toml
+# Define the path to the dotfiles
+DOTFILES_PATH="oxy-dotfiles"
+
+# create symlinks to the dotfiles
+ln -sf ~/$DOTFILES_PATH/.gitconfig ~/.gitconfig
+ln -sf ~/$DOTFILES_PATH/linux/.bashrc ~/.bashrc
+ln -sf ~/$DOTFILES_PATH/linux/.zprofile ~/.zprofile
+ln -sf ~/$DOTFILES_PATH/linux/.zshrc ~/.zshrc
+ln -sf ~/$DOTFILES_PATH/.config/starship.toml ~/.config/starship.toml
 
 # Echo success message
 echo 'Successfully installed dotfiles'

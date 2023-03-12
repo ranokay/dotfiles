@@ -1,10 +1,8 @@
-# Oxy Dotfiles (Still in development)
+# Oh My Zsh + Starship + Nerd Fonts
 
-Dotfiles are hidden configuration files for command-line shells like bash, zsh, and PowerShell. They usually contain aliases, environment variables, and other custom settings that personalize your command-line experience.
+This repository contains my personal dotfiles for both Linux and Windows command-line shells like bash, zsh, and PowerShell. Feel free to use them as a starting point for your own configuration.
 
-This repository contains my personal dotfiles for both Linux and Windows. Feel free to use them as a starting point for your own configuration. And the title Oxy is just a random name I came up with, it has nothing to do with configuration files. 🙂
-
-You can change the name of the repository to whatever you want when you clone it, but you'll need to update all the paths in the installation script. I recommend using the name `dotfiles` for consistency.
+You can change the name of the repository to whatever you want when you clone it, but you'll need to update the path in the installation script `DOTFILES_PATH="new-dotfiles-name"`. I recommend using the name `dotfiles` for consistency.
 
 ## Installation
 
@@ -100,7 +98,7 @@ After making changes to your dotfiles, you'll need to reload your shell to see t
 
 ## Nix, Flakes and Home Manager
 
-Cooming soon.
+Cooming soon...
 
 ## Disclaimer
 
