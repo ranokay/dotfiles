@@ -13,7 +13,7 @@ zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
 ENABLE_CORRECTION="true" # correct mistyped commands
 
-plugins=(git z dotenv zsh-autosuggestions zsh-syntax-highlighting zsh-interactive-cd)
+plugins=(git z dotenv zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh # Load the oh-my-zsh's library.
 

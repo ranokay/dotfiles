@@ -2,7 +2,7 @@
 
 Dotfiles are hidden configuration files for command-line shells like bash, zsh, and PowerShell. They usually contain aliases, environment variables, and other custom settings that personalize your command-line experience.
 
-This repository contains my personal dotfiles for both Linux and Windows. Feel free to use them as a starting point for your own configuration. And the title Oxy is just a random name I came up with, it has nothing to do with configuration files. :smile:
+This repository contains my personal dotfiles for both Linux and Windows. Feel free to use them as a starting point for your own configuration. And the title Oxy is just a random name I came up with, it has nothing to do with configuration files. 🙂
 
 You can change the name of the repository to whatever you want when you clone it, but you'll need to update all the paths in the installation script. I recommend using the name `dotfiles` for consistency.
 
@@ -18,7 +18,7 @@ To install the dotfiles, clone this repository to your home directory and run th
    git clone https://github.com/ranokay/oxy-dotfiles.git
    ```
 
-   Then, move to the oxy-dotfiles directory:
+   Then, move to the oxy-dotfiles/linux directory:
 
    ```bash
    cd oxy-dotfiles/linux
@@ -39,21 +39,30 @@ To install the dotfiles, clone this repository to your home directory and run th
    ```
 
 3. Restart your terminal.
+
    ```bash
     source ~/.bashrc
    ```
 
-This script will also install the following packages:
+   or if you are using zsh
 
-- [Oh My Zsh](https://ohmyz.sh/) (Linux only)
+   ```bash
+    source ~/.zshrc
+   ```
 
-- [Nerd Fonts](https://www.nerdfonts.com/) (Cooming soon)
+This script will also install the following packages if they are not already installed:
 
-- [Chocolatey](https://chocolatey.org/) (Windows only)
+- [Oh My Zsh](https://ohmyz.sh/)
 
-- [Starship](https://starship.rs/) (Both Linux and Windows)
+- [Nerd Fonts](https://www.nerdfonts.com/)
 
-- [zsh-autosuggestions](
+- [Starship](https://starship.rs/)
+
+- [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
+
+- [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)
+
+You'll also need to install at least one [Nerd Font](https://www.nerdfonts.com/font-downloads) to use the icons in the prompt. I recommend using [Fira Code Nerd Font] or [Caskaydia Cove Nerd Font].
 
 ### Windows
 
@@ -94,7 +103,7 @@ You can customize your dotfiles by editing the files in the ~/oxy-dotfiles direc
 
 After making changes to your dotfiles, you'll need to reload your shell to see the changes take effect. You can do this by typing `. $PROFILE` depending on your shell.
 
-## Nix, flakes and home-manager
+## Nix, Flakes and Home Manager
 
 Cooming soon.
 
