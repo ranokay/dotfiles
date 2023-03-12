@@ -51,6 +51,7 @@ This script will also install the following packages if they are not already ins
 - [Starship](https://starship.rs/)
 - [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
 - [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)
+- [exa](https://the.exa.website/) (You may need to introduce the sudo password to install this package.)
 
 ### Windows
 

@@ -29,6 +29,12 @@ if ! [ -x "$(command -v starship)" ]; then
 	curl -fsSL https://starship.rs/install.sh | bash
 fi
 
+# Check if exa is installed and install it if not
+if ! [ -x "$(command -v exa)" ]; then
+	echo 'Installing exa'
+	sudo apt install exa
+fi
+
 # Define the path to the dotfiles
 DOTFILES_PATH="oxy-dotfiles"
 
