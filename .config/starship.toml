@@ -35,10 +35,10 @@ symbol = ""
 
 [git_status]
 format = '[$all_status$ahead_behind]($style) '
-conflicted = '🏳'
-ahead = '🏎💨'
-behind = '😰'
-diverged = '😵'
+conflicted = '!'
+ahead = '🔼'
+behind = '🔽'
+diverged = '🔀'
 stashed = '📦'
 modified = '📝'
 staged = '[++\($count\)](green)'

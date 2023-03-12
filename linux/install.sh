@@ -45,5 +45,5 @@ ln -sf ~/$DOTFILES_PATH/linux/.zprofile ~/.zprofile
 ln -sf ~/$DOTFILES_PATH/linux/.zshrc ~/.zshrc
 ln -sf ~/$DOTFILES_PATH/.config/starship.toml ~/.config/starship.toml
 
-# Echo success message
-echo 'Successfully installed dotfiles'
+# Echo success message colorized in green
+echo "\e[32mSuccessfully installed dotfiles\e[0m"
