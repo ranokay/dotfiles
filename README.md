@@ -1,4 +1,4 @@
-# Oxy Dotfiles
+# Oxy Dotfiles (Still in development)
 
 Dotfiles are hidden configuration files for command-line shells like bash, zsh, and PowerShell. They usually contain aliases, environment variables, and other custom settings that personalize your command-line experience.
 
@@ -68,3 +68,16 @@ You can customize your dotfiles by editing the files in the ~/oxy-dotfiles direc
 - Set environment variables in `bash_env`, `zsh_env`, or `powershell_env`.
 
 After making changes to your dotfiles, you'll need to reload your shell to see the changes take effect. You can do this by typing `source ~/.bashrc`, `source ~/.zshrc`, or `. $PROFILE` depending on your shell.
+
+### Windows
+
+You can customize your dotfiles by editing the files in the ~/oxy-dotfiles directory. Here are some examples of what you can do:
+
+- Add new aliases to `powershell_aliases`.
+- Set environment variables in `powershell_env`.
+
+After making changes to your dotfiles, you'll need to reload your shell to see the changes take effect. You can do this by typing `. $PROFILE` depending on your shell.
+
+## Disclaimer
+
+Use these dotfiles at your own risk. I am not responsible for any damage they may cause to your system.
