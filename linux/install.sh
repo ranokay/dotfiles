@@ -26,7 +26,7 @@ fi
 # Check if starship is installed and install it if not
 if ! [ -x "$(command -v starship)" ]; then
 	echo 'Installing starship'
-	curl -fsSL https://starship.rs/install.sh | bash
+	curl -sS https://starship.rs/install.sh | sh
 fi
 
 # Check if exa is installed and install it if not
