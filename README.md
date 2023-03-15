@@ -2,8 +2,6 @@
 
 This repository contains my personal dotfiles for both Linux and Windows command-line shells like bash, zsh, and PowerShell. Feel free to use them as a starting point for your own configuration.
 
-You can change the name of the repository to whatever you want when you clone it, but you'll need to update the path in the installation script `DOTFILES_PATH="new-dotfiles-name"`. I recommend using the name `dotfiles` for consistency.
-
 ## Installation
 
 To install the dotfiles, clone this repository to your home directory and run the install script. The install script will create symbolic links from the dotfiles in this repository to your home directory. It will also prompt you to overwrite any existing dotfiles, so be careful. If you want to keep your existing dotfiles, you can copy the contents of the dotfiles in this repository into your existing dotfiles.
@@ -15,7 +13,7 @@ You'll need to install at least one [Nerd Font](https://www.nerdfonts.com/font-d
 1. Clone the repository to your home directory and move to the linux directory:
 
    ```bash
-   git clone https://github.com/ranokay/oxy-dotfiles.git
+   git clone https://github.com/ranokay/dotfiles.git
    cd oxy-dotfiles/linux
    ```
 
