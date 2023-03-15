@@ -60,13 +60,13 @@ This script will also install the following packages if they are not already ins
    cd oxy-dotfiles/windows
    ```
 
-   2. Run the install script:
+2. Run the install script:
 
    ```powershell
    .\install.ps1
    ```
 
-2. Restart your terminal:
+3. Restart your terminal:
    ```powershell
     . $PROFILE
    ```
