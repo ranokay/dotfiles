@@ -36,7 +36,7 @@ if ! [ -x "$(command -v exa)" ]; then
 fi
 
 # Define the path to the dotfiles
-DOTFILES_PATH="oxy-dotfiles"
+DOTFILES_PATH="dotfiles"
 
 # create symlinks to the dotfiles
 ln -sf ~/$DOTFILES_PATH/.gitconfig ~/.gitconfig
