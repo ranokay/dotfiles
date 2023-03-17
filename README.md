@@ -1,4 +1,4 @@
-# Oh My Zsh + Starship + Nerd Fonts
+# Oh My Zsh + Starship + Nerd Fonts (wip)
 
 This repository contains my personal dotfiles for both Linux and Windows command-line shells like bash, zsh, and PowerShell. Feel free to use them as a starting point for your own configuration.
 
