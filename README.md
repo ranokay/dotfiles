@@ -67,6 +67,7 @@ This script will also install the following packages if they are not already ins
    ```
 
 3. Restart your terminal:
+
    ```powershell
     . $PROFILE
    ```

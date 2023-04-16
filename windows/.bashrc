@@ -10,4 +10,3 @@ alias pnig='pnpm i -g'
 alias pnup='pnpm up'
 
 eval "$(starship init bash)"
-
