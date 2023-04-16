@@ -1,7 +1,7 @@
-# Brave HiDPI scaling settings for KDE Plasma
 [Desktop Entry]
 Name=Brave Browser
 Exec=env brave --force-device-scale-factor=2.25 %U
-Icon=/usr/share/icons/char-white/apps/16/brave.svg
+Icon= brave-desktop
 Terminal=false
 Type=Application
+Categories=Internet;Network;WebBrowser;
