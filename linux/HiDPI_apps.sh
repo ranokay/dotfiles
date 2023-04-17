@@ -3,80 +3,62 @@
 DOTFILES_PATH="dotfiles/linux/.local/share/applications"
 LOCAL_PATH=".local/share/applications"
 
+# Define colors for output
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+RED="\033[0;31m"
+BLUE="\033[0;34m"
+NC="\033[0m" # No Color
+
 # Check if the target directory exists, create it if not
 if [ ! -d ~/$LOCAL_PATH ]; then
 	mkdir -p ~/$LOCAL_PATH
 fi
 
-echo "Please choose which settings to apply (separate choices with a space):"
-echo "a) All apps"
-echo "q) Exit"
-echo "1) Brave Browser"
-echo "2) VS Code"
-echo "3) Spotify"
+# List apps
+apps=($(ls ~/$DOTFILES_PATH))
+
+echo -e "${YELLOW}Please choose which settings to apply (separate choices with a space):${NC}"
+for i in "${!apps[@]}"; do
+	app_name=${apps[i]%.*}
+	echo -e "${GREEN}$((i + 1))) ${app_name^}${NC}"
+done
+echo -e "${BLUE}a) All apps${NC}"
+echo -e "${RED}q) Exit${NC}"
 
 read -p "Enter your choices (e.g., '1 2' or 'a'): " choices
 
 # Convert the choices string into an array
 IFS=' ' read -ra choice_array <<<"$choices"
 
-# 1. Brave Browser
-apply_brave_browser() {
-	ln -sf ~/$DOTFILES_PATH/brave-browser.desktop ~/$LOCAL_PATH/brave-browser.desktop
-	sudo chmod +x ~/$LOCAL_PATH/brave-browser.desktop
-	echo "Brave Browser settings applied."
-}
-
-# 2. VS Code
-apply_vs_code() {
-	ln -sf ~/$DOTFILES_PATH/code.desktop ~/$LOCAL_PATH/code.desktop
-	sudo chmod +x ~/$LOCAL_PATH/code.desktop
-	echo "VS Code settings applied."
-}
-
-# 3. Spotify
-apply_spotify() {
-	ln -sf ~/$DOTFILES_PATH/spotify.desktop ~/$LOCAL_PATH/spotify.desktop
-	sudo chmod +x ~/$LOCAL_PATH/spotify.desktop
-	echo "Spotify settings applied."
-}
-
-# All apps
-apply_all_apps() {
-	for file in ~/$DOTFILES_PATH/*.desktop; do
-		filename=$(basename "$file")
-		ln -sf "$file" ~/$LOCAL_PATH/"$filename"
-		sudo chmod +x ~/$LOCAL_PATH/"$filename"
-	done
-	echo "All app settings applied."
+apply_app_settings() {
+	app=${apps[$1]}
+	ln -sf ~/$DOTFILES_PATH/"$app" ~/$LOCAL_PATH/"$app"
+	sudo chmod +x ~/$LOCAL_PATH/"$app"
+	app_name=${app%.*}
+	echo -e "${GREEN}${app_name^} settings applied.${NC}"
 }
 
 for choice in "${choice_array[@]}"; do
 	case $choice in
-	1)
-		apply_brave_browser
-		;;
-
-	2)
-		apply_vs_code
-		;;
-
-	3)
-		apply_spotify
-		;;
-
 	a | A)
-		apply_all_apps
+		for i in "${!apps[@]}"; do
+			apply_app_settings "$i"
+		done
 		;;
 
 	q | Q)
-		echo "Exiting without applying any settings."
+		echo -e "${RED}Exiting without applying any settings.${NC}"
 		exit 0
 		;;
 
 	*)
-		echo "Invalid choice. Exiting."
-		exit 1
+		if [[ $choice -ge 1 && $choice -le ${#apps[@]} ]]; then
+			apply_app_settings "$((choice - 1))"
+		else
+			echo -e "${RED}Invalid choice. Exiting.${NC}"
+			exit 1
+		fi
 		;;
 	esac
 done
