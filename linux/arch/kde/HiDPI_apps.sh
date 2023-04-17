@@ -1,6 +1,10 @@
 # Apply HiDPI scaling settings for KDE Plasma apps
 
-DOTFILES_PATH="dotfiles/linux/.local/share/applications"
+# Get the script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
+# Define the relative DOTFILES_PATH
+DOTFILES_PATH="$SCRIPT_DIR/.local/share/applications"
 LOCAL_PATH=".local/share/applications"
 
 # Define colors for output
@@ -16,12 +20,12 @@ if [ ! -d ~/$LOCAL_PATH ]; then
 fi
 
 # List apps
-apps=($(ls ~/$DOTFILES_PATH))
+apps=($(ls "$DOTFILES_PATH"))
 
 echo -e "${YELLOW}Please choose which settings to apply (separate choices with a space):${NC}"
 for i in "${!apps[@]}"; do
 	app_name=${apps[i]%.*}
-	echo -e "${GREEN}$((i + 1))) ${app_name^}${NC}"
+	echo -e "${GREEN}$((i + 1)))${NC} ${app_name^}"
 done
 echo -e "${BLUE}a) All apps${NC}"
 echo -e "${RED}q) Exit${NC}"
@@ -33,7 +37,7 @@ IFS=' ' read -ra choice_array <<<"$choices"
 
 apply_app_settings() {
 	app=${apps[$1]}
-	ln -sf ~/$DOTFILES_PATH/"$app" ~/$LOCAL_PATH/"$app"
+	ln -sf "$DOTFILES_PATH/$app" ~/$LOCAL_PATH/"$app"
 	sudo chmod +x ~/$LOCAL_PATH/"$app"
 	app_name=${app%.*}
 	echo -e "${GREEN}${app_name^} settings applied.${NC}"
@@ -48,7 +52,7 @@ for choice in "${choice_array[@]}"; do
 		;;
 
 	q | Q)
-		echo -e "${RED}Exiting without applying any settings.${NC}"
+		echo -e "${GREEN}Exiting without applying any settings.${NC}"
 		exit 0
 		;;
 

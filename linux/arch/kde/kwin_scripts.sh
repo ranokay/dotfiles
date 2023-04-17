@@ -1,6 +1,10 @@
 # Copy kwin scripts from dotfiles to .local directory
 
-DOTFILES_PATH="dotfiles/linux/.local/share/kwin/scripts"
+# Get the script's location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
+# Define the relative DOTFILES_PATH
+DOTFILES_PATH="$SCRIPT_DIR/.local/share/kwin/scripts"
 LOCAL_PATH=".local/share/kwin/scripts"
 
 # Define colors for output
@@ -16,7 +20,7 @@ if [ ! -d ~/$LOCAL_PATH ]; then
 fi
 
 # List kwin scripts
-scripts=($(ls ~/$DOTFILES_PATH))
+scripts=($(ls "$DOTFILES_PATH"))
 
 echo -e "${YELLOW}Please choose which kwin scripts to copy (separate choices with a space):${NC}"
 for i in "${!scripts[@]}"; do
@@ -32,7 +36,7 @@ IFS=' ' read -ra choice_array <<<"$choices"
 
 copy_kwin_script() {
 	script_name=${scripts[$1]}
-	cp -r ~/$DOTFILES_PATH/"$script_name" ~/$LOCAL_PATH/"$script_name"
+	cp -r "$DOTFILES_PATH/$script_name" ~/$LOCAL_PATH/"$script_name"
 	echo -e "${GREEN}Copied kwin script: $script_name${NC}"
 }
 
