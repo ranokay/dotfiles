@@ -1,0 +1,28 @@
+# General aliases
+alias c="clear"
+alias h="history"
+alias e="exit"
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+# Git aliases
+alias g="git"
+alias gs="git status"
+alias gaa="git add ."
+alias gcmt="git commit -m"
+alias gpull="git pull"
+alias gpush="git push"
+alias gcl="git clone"
+alias gco="git checkout"
+
+# Node aliases
+alias pn="pnpm"
+alias pni="pnpm install"
+alias y="yarn"
+alias n="npm"
+alias ni="npm install"
+
+# Docker aliases
+alias d="docker"
+alias dc="docker-compose"

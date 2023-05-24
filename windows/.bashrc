@@ -1,12 +1,19 @@
-alias gaa='git add .'
-alias gcmt='git commit'
-alias gpush='git push'
-alias gpull='git pull'
-alias gco='git checkout'
-alias gcm='git checkout main'
-alias pn='pnpm'
-alias pni='pnpm i'
-alias pnig='pnpm i -g'
-alias pnup='pnpm up'
+# General aliases
+alias ls='ls -C --color=auto'
+alias ll='ls -alF'
 
-eval "$(starship init bash)"
+alias gupdate='git update-git-for-windows'
+
+# Load aliases, if they exist
+if [ -f ~/.aliases ]; then
+	. ~/.aliases
+fi
+
+# Check if command exists before running
+if command -v starship >/dev/null; then
+	eval "$(starship init bash)"
+fi
+
+if command -v fnm >/dev/null; then
+	eval "$(fnm env --use-on-cd)"
+fi

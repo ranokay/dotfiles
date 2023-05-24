@@ -1,6 +1,3 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -13,17 +10,12 @@ zstyle ':omz:update' mode reminder # just remind me to update when it's time
 
 ENABLE_CORRECTION="true" # correct mistyped commands
 
-plugins=(git z dotenv zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git z zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh # Load the oh-my-zsh's library.
 
 alias ls="exa -abhl --icons --grid --color=always --group-directories-first"
-alias c="clear"
-alias gs="git status"
-alias gaa="git add ."
-alias gcm="git commit -m"
-alias gpull="git pull"
-alias gpush="git push"
+source ~/.aliases # Load aliases.
 
 eval "$(starship init zsh)" # starship prompt
 

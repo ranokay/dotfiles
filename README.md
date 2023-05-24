@@ -6,15 +6,14 @@ This repository contains my personal dotfiles for both Linux and Windows command
 
 To install the dotfiles, clone this repository to your home directory and run the install script. The install script will create symbolic links from the dotfiles in this repository to your home directory. It will also prompt you to overwrite any existing dotfiles, so be careful. If you want to keep your existing dotfiles, you can copy the contents of the dotfiles in this repository into your existing dotfiles.
 
-You'll need to install at least one [Nerd Font](https://www.nerdfonts.com/font-downloads) to use the icons in the prompt. I recommend using `Fira Code Nerd Font` or `Caskaydia Cove Nerd Font`.
+You'll need to install at least one of the [Nerd Fonts](https://www.nerdfonts.com/font-downloads) to use the icons in the prompt. I recommend using `Fira Code Nerd Font` or `Caskaydia Cove Nerd Font`.
 
 ### Linux
 
-1. Clone the repository to your home directory and move to the linux directory:
+1. Clone the repository to your home directory and go to the linux directory:
 
    ```bash
-   git clone https://github.com/ranokay/dotfiles.git
-   cd oxy-dotfiles/linux
+   cd dotfiles/linux
    ```
 
 2. Run the install script:
@@ -56,14 +55,20 @@ This script will also install the following packages if they are not already ins
 1. Clone the repository to your home directory and move to the windows directory:
 
    ```powershell
-   git clone https://github.com/ranokay/oxy-dotfiles.git
-   cd oxy-dotfiles/windows
+   git clone https://github.com/ranokay/dotfiles.git
+   cd dotfiles/windows
    ```
 
 2. Run the install script:
 
    ```powershell
    .\install.ps1
+   ```
+
+   if you get an error about the execution policy, you can run the following command to allow the execution of scripts:
+
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    ```
 
 3. Restart your terminal:
@@ -80,10 +85,10 @@ This script will also install the following packages if they are not already ins
 
 ### Linux
 
-You can customize your dotfiles by editing the files in the ~/oxy-dotfiles directory. Here are some examples of what you can do:
+You can customize your dotfiles by editing the files in the ~/dotfiles directory. Here are some examples of what you can do:
 
-- Add new aliases to `bash_aliases`, `zsh_aliases`, or `powershell_aliases`.
-- Set environment variables in `bash_env`, `zsh_env`, or `powershell_env`.
+- Add new aliases to `bash_aliases`, `zsh_aliases`.
+- Set environment variables in `bash_env`, `zsh_env`.
 
 After making changes to your dotfiles, you'll need to reload your shell to see the changes take effect. You can do this by typing `source ~/.bashrc`, `source ~/.zshrc`, or `. $PROFILE` depending on your shell.
 
