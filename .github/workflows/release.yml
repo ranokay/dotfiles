@@ -30,8 +30,6 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           tag="v$(date +'%Y.%m.%d.%H')"
-          git config user.name "Release Bot"
-          git config user.email "actions@github.com"
           git tag $tag
           git push origin $tag
 
@@ -43,5 +41,6 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: nixos.iso
