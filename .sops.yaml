@@ -1,6 +1,6 @@
 keys:
   - &mbp
-  - &oxyhome
+  - &oxyhome age1gta0322wh8j89km3a34ehr79wd28v87vqz3jjydqthg9afl6ryssjsewtg
 creation_rules:
   - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
     key_groups:
