@@ -24,15 +24,19 @@ jobs:
           git tag $tag
           git push origin $tag
 
+      - name: Output Tag Name
+        id: vars
+        run: echo "TAG=$tag" >> $GITHUB_ENV
+
   # This job builds the ISO
   build:
     runs-on: ubuntu-latest
     needs: create_tag # Ensure the tag creation job runs first if triggered manually
     steps:
-      - name: Checkout
+      - name: Checkout Tag
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ env.TAG }} # Checkout the newly created tag
 
       - uses: cachix/install-nix-action@v27
 
@@ -55,17 +59,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: build # Ensure the build is completed before attempting the release
     steps:
-      - name: Checkout
+      - name: Checkout Tag
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ env.TAG }} # Checkout the tag again to ensure the release matches
 
       - name: Download ISO
         uses: actions/download-artifact@v4
         with:
           name: nixos.iso
 
-      - name: Release
+      - name: Release ISO
         uses: softprops/action-gh-release@v2
         with:
           files: nixos.iso
