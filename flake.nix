@@ -60,25 +60,25 @@
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     darwinConfigurations = {
-      mbp = nix-darwin.lib.darwinSystem {
+      mac1 = nix-darwin.lib.darwinSystem {
         specialArgs = {inherit inputs outputs;};
-        modules = [./machines/mbp/configuration.nix];
+        modules = [./machines/mac1/configuration.nix];
       };
     };
 
     nixosConfigurations = {
-      iso = nixpkgs.lib.nixosSystem {
+      iso1 = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs outputs;};
         modules = [
           (nixpkgs + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix")
-          ./machines/iso/configuration.nix
+          ./machines/iso1/configuration.nix
         ];
       };
 
-      oxyhome = nixpkgs.lib.nixosSystem {
+      svr1 = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};
-        modules = [./machines/oxyhome/configuration.nix];
+        modules = [./machines/svr1/configuration.nix];
       };
     };
   };
