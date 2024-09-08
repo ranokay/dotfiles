@@ -31,18 +31,19 @@
     };
   };
 
-  networking = {
-    hostName = "oxyhome";
-    interfaces = {
-      enp0s20f0u1 = {
-        ipv4.addresses = [
-          {
-            address = "192.168.0.100";
-            prefixLength = 24;
-          }
-        ];
-      };
-    defaultGateway = "192.168.0.1";
-    };
-  };
+  networking.hostName = "oxyhome";
+  # networking = {
+  #   hostName = "oxyhome";
+  #   interfaces = {
+  #     enp0s20f0u1 = {
+  #       ipv4.addresses = [
+  #         {
+  #           address = "192.168.0.100";
+  #           prefixLength = 24;
+  #         }
+  #       ];
+  #     };
+  #   defaultGateway = "192.168.0.1";
+  #   };
+  # };
 }

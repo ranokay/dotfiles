@@ -14,7 +14,7 @@
       (lib.mkIf pkgs.stdenv.isLinux "/home/ranokay")
       (lib.mkIf pkgs.stdenv.isDarwin "/Users/ranokay")
     ];
-    stateVersion = "24.05";
+    stateVersion = "23.11";
     sessionVariables = lib.mkIf pkgs.stdenv.isDarwin {
       SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
     };

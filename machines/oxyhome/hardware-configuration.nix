@@ -10,14 +10,16 @@
 
   boot = {
     initrd = {
-      # `readlink /sys/class/net/enp0s20f0u1/device/driver` indicates "r8152" is the ethernet driver for this device
-      availableKernelModules = ["xhci_pci" "ahci" "nvme" "usb_storage" "sd_mod" "rtsx_usb_sdmmc"];
+      availableKernelModules = ["nvme" "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_usb_sdmmc"];
       luks = {
         reusePassphrases = true;
         devices = {
           "cryptroot" = {
             device = "/dev/nvme0n1p2";
             allowDiscards = true;
+          };
+          "fun" = {
+            device = "/dev/sda1";
           };
         };
       };
@@ -37,6 +39,10 @@
     };
     "/nix" = {
       device = "/dev/disk/by-label/nix";
+      fsType = "ext4";
+    };
+    "/fun" = {
+      device = "/dev/disk/by-label/fun";
       fsType = "ext4";
     };
   };

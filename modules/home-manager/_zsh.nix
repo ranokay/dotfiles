@@ -17,7 +17,5 @@
         eval "$(/opt/homebrew/bin/brew shellenv)"
       fi
     '';
-    plugins = [
-    ];
   };
 }
