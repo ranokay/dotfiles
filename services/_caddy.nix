@@ -15,7 +15,7 @@
 				{ name = "caddy-dns/cloudflare"; repo = "github.com/caddy-dns/cloudflare"; version = "89f16b99c18ef49c8bb470a82f895bce01cbaece"; }
 				# Commit on Jul 3, 2024 Version: 89f16b9
 			];
-			vendorHash = "";  # Add this as explained in https://github.com/NixOS/nixpkgs/pull/259275#issuecomment-1763478985
+			vendorHash = "sha256-YNcQtjPGQ0XMSog+sWlH4lG/QdbdI0Lyh/fUGqQUFaY=";  # Add this as explained in https://github.com/NixOS/nixpkgs/pull/259275#issuecomment-1763478985
 		});
 		globalConfig = ''
 			dns cloudflare {
