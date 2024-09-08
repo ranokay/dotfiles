@@ -7,7 +7,7 @@
     isNormalUser = true;
     extraGroups = ["wheel"];
     openssh.authorizedKeys.keys = [
-      # 1Password OxyHome SSH key
+      # 1Password OxyHome Key
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID6IDrLYme7Jz4omKXvFBGoSseC+TLJZtmIIJe4VhJTC"
     ];
   };

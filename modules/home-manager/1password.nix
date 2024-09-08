@@ -19,6 +19,7 @@
     userName = "ranokay";
     userEmail = "github@ranokay.com";
     signing = {
+      # 1Password GitHub Commit Signing Key
       key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGOlQ9WC58WUVNYtM0tL1YJHDtCMpnLBhtZ3UcQH3dwj";
       signByDefault = true;
     };
