@@ -1,5 +1,5 @@
 keys:
-  - &oxyhome age1ayscr4gjzf5gyez5khvygakfjt3yyxlv6vuwjc275hpe2kmslarsykqrs8
+  - &oxyhome age13v6aepw6hc8ltd3w6f6ztf4p8vjdp3fxqx0d9fxddzj32d00x5hqfz8k9v
 creation_rules:
   - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
     key_groups:
