@@ -35,7 +35,6 @@
     hostName = "oxyhome";
     interfaces = {
       enp0s20f0u1 = {
-        useDHCP = lib.mkDefault true;
         ipv4.addresses = [
           {
             address = "192.168.0.100";
