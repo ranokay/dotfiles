@@ -30,6 +30,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           tag="v$(date +'%Y.%m.%d.%H.%M')"
+          echo "TAG=$tag" >> $GITHUB_ENV
           git tag $tag
           git push origin $tag
 
@@ -42,5 +43,5 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: $tag
+          tag_name: ${{ env.TAG }}
           files: nixos.iso
