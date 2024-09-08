@@ -29,7 +29,9 @@ jobs:
       - name: Create Tag (if manual run)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          tag="v$(date +'%Y%m%d%H%M%S')"
+          tag=$(date +%y.%m.%d.%H)
+          git config user.name "Release Bot"
+          git config user.email "actions@github.com"
           git tag $tag
           git push origin $tag
 
