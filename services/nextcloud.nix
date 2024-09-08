@@ -5,7 +5,7 @@
   ...
 }: {
   imports = [
-    ./_caddy.nix
+    # ./_caddy.nix
   ];
 
   sops.secrets.nextcloud-adminpassfile = {
@@ -58,11 +58,11 @@
       };
     };
 
-    caddy = {
-      virtualHosts."nextcloud.home.oxystack.com".extraConfig = ''
-        reverse_proxy http://192.168.0.101
-      '';
-    };
+    # caddy = {
+    #   virtualHosts."nextcloud.home.oxystack.com".extraConfig = ''
+    #     reverse_proxy http://192.168.0.101
+    #   '';
+    # };
   };
 
   # Need ffmpeg to handle video thumbnails
