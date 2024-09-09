@@ -13,6 +13,7 @@
     ./../../modules/nixos/remote-unlock.nix
     ./../../modules/nixos/auto-update.nix
 
+    ./../../services/caddy.nix
     ./../../services/tailscale.nix
     ./../../services/netdata.nix
     ./../../services/nextcloud.nix

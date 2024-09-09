@@ -4,11 +4,7 @@
   lib,
   ...
 }: {
-  imports = [
-    ./_caddy.nix
-  ];
-
-  sops.secrets.nextcloud-adminpassfile = {
+  sops.secrets.nextcloud_adminpassfile = {
     owner = "nextcloud";
     group = "nextcloud";
   };
@@ -33,7 +29,7 @@
 
       config = {
         adminuser = "ranokay";
-        adminpassFile = config.sops.secrets.nextcloud-adminpassfile.path;
+        adminpassFile = config.sops.secrets.nextcloud_adminpassfile.path;
         dbtype = "pgsql";
       };
 
@@ -56,12 +52,6 @@
           "OC\\Preview\\MP4"
         ];
       };
-    };
-
-    caddy = {
-      virtualHosts."nextcloud.home.oxystack.com".extraConfig = ''
-        reverse_proxy http://192.168.0.101
-      '';
     };
   };
 
