@@ -12,6 +12,7 @@
     ./../../modules/nixos/base.nix
     ./../../modules/nixos/remote-unlock.nix
     ./../../modules/nixos/auto-update.nix
+    ./../../modules/nixos/auto-cpufreq.nix
 
     ./../../services/caddy.nix
     ./../../services/tailscale.nix

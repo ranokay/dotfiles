@@ -7,13 +7,13 @@
     isNormalUser = true;
     extraGroups = ["wheel"];
     openssh.authorizedKeys.keys = [
-      # 1Password OxyHome Key
+      # 1Password NixOS ISO Key
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID6IDrLYme7Jz4omKXvFBGoSseC+TLJZtmIIJe4VhJTC"
     ];
   };
 
   programs.bash.shellAliases = {
-    install = "sudo bash -c '$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/install.sh)'";
+    install = "sudo bash -c \"$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/install.sh)\"";
   };
 
   security.sudo.wheelNeedsPassword = false;
@@ -22,8 +22,8 @@
 
   services.openssh = {
     enable = true;
-    passwordAuthentication = false;
     permitRootLogin = "yes";
+    passwordAuthentication = false;
   };
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

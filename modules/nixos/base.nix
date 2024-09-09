@@ -9,13 +9,16 @@
     ./_packages.nix
   ];
 
-  boot.loader = {
-    systemd-boot = {
-      enable = true;
-      configurationLimit = 5;
+  boot = {
+    loader = {
+      systemd-boot = {
+        enable = true;
+        configurationLimit = 5;
+      };
+      efi.canTouchEfiVariables = true;
+      timeout = 1;
     };
-    efi.canTouchEfiVariables = true;
-    timeout = 10;
+    kernelParams = ["consoleblank=30"];
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -38,17 +41,19 @@
     secrets.user_password = {};
   };
 
-  users.mutableUsers = false;
-  users.users.ranokay = {
-    isNormalUser = true;
-    description = "ranokay";
-    extraGroups = ["networkmanager" "wheel"];
-    openssh.authorizedKeys.keys = [
-      # 1Password OxyHome Key
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID6IDrLYme7Jz4omKXvFBGoSseC+TLJZtmIIJe4VhJTC"
-    ];
-    shell = pkgs.zsh;
-    hashedPasswordFile = config.sops.secrets.user_password.path;
+  users = {
+    mutableUsers = false;
+    users.ranokay = {
+      isNormalUser = true;
+      description = "ranokay";
+      extraGroups = ["networkmanager" "wheel"];
+      openssh.authorizedKeys.keys = [
+        # 1Password OxyHome Key
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEl83hIDNGt0isJytFHN305/KvaDJkn4ZcSquIXKzmL3"
+      ];
+      shell = pkgs.zsh;
+      hashedPasswordFile = config.sops.secrets.user_password.path;
+    };
   };
 
   services = {
@@ -61,6 +66,7 @@
       openFirewall = true;
     };
     fstrim.enable = true;
+    logind.lidSwitch = "ignore";
   };
 
   networking = {
@@ -92,8 +98,6 @@
       "/etc/machine-id"
       "/etc/ssh/ssh_host_ed25519_key.pub"
       "/etc/ssh/ssh_host_ed25519_key"
-      "/etc/ssh/ssh_host_rsa_key.pub"
-      "/etc/ssh/ssh_host_rsa_key"
     ];
   };
 

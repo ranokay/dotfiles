@@ -13,7 +13,7 @@
     nextcloud = {
       enable = true;
       package = pkgs.nextcloud29;
-      hostName = "192.168.0.101";
+      hostName = "192.168.0.100:8080";
 
       https = true;
       maxUploadSize = "50G";

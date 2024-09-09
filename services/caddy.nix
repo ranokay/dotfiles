@@ -30,14 +30,14 @@ in {
       }
 
       # navidrome
-      navidrome.proxmox.oxystack.com {
-        reverse_proxy http://192.168.0.102:4533
-        import cloudflare
-      }
+      # navidrome.proxmox.oxystack.com {
+      #   reverse_proxy http://192.168.0.102:4533
+      #   import cloudflare
+      # }
 
       # nextcloud
-      nextcloud.proxmox.oxystack.com {
-        reverse_proxy https://192.168.0.101 {
+      nextcloud.home.oxystack.com {
+        reverse_proxy https://192.168.0.100:8080 {
           transport http {
             tls_insecure_skip_verify
           }
@@ -46,7 +46,7 @@ in {
       }
 
       # huawei
-      huawei.proxmox.oxystack.com {
+      huawei.home.oxystack.com {
         reverse_proxy http://192.168.0.1
         import cloudflare
       }
@@ -64,6 +64,12 @@ in {
     EnvironmentFile = [
       config.sops.secrets.cloudflare_zone_key.path
       config.sops.secrets.cloudflare_api_key.path
+    ];
+  };
+
+  environment.persistence."/nix/persist" = {
+    directories = [
+      "/var/lib/caddy"
     ];
   };
 }

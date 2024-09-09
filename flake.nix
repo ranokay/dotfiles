@@ -39,6 +39,11 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+
+    auto-cpufreq = {
+      url = "github:AdnanHodzic/auto-cpufreq";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
