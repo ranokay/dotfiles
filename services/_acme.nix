@@ -10,7 +10,7 @@
     defaults.email = "oxyhome@ranokay.com";
 
     certs."home.oxystack.com" = {
-      group = config.services.caddy.group;
+      inherit (config.services.caddy) group;
 
       domain = "home.oxystack.com";
       extraDomainNames = ["*.home.oxystack.com"];
