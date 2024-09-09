@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "auto-cpufreq": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1725514537,
+        "narHash": "sha256-Xsh3d7rQY7RKzZ7J0swrgxZEyITb7B3oX5F/tcBGjfk=",
+        "owner": "AdnanHodzic",
+        "repo": "auto-cpufreq",
+        "rev": "a42e8fb51e08059411d52451141cac86f1bc788a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "AdnanHodzic",
+        "repo": "auto-cpufreq",
+        "type": "github"
+      }
+    },
     "brew-src": {
       "flake": false,
       "locked": {
@@ -226,6 +246,7 @@
     },
     "root": {
       "inputs": {
+        "auto-cpufreq": "auto-cpufreq",
         "home-manager": "home-manager",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
