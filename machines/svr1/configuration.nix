@@ -6,19 +6,18 @@
   imports = [
     inputs.impermanence.nixosModules.impermanence
     inputs.home-manager.nixosModules.home-manager
-    inputs.auto-cpufreq.nixosModules.default
 
     ./hardware-configuration.nix
 
     ./../../modules/nixos/base.nix
     ./../../modules/nixos/remote-unlock.nix
     ./../../modules/nixos/auto-update.nix
-    ./../../modules/nixos/auto-cpufreq.nix
 
     ./../../services/caddy.nix
     ./../../services/tailscale.nix
     ./../../services/netdata.nix
     ./../../services/nextcloud.nix
+    ./../../services/auto-cpufreq.nix
   ];
 
   home-manager = {
