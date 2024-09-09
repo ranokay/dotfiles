@@ -17,6 +17,7 @@
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "homebrew/homebrew-core" = inputs.homebrew-core;
     };
+    autoMigrate = true;
   };
 
   homebrew = {
