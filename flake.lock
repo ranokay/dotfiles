@@ -1,25 +1,5 @@
 {
   "nodes": {
-    "auto-cpufreq": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1725514537,
-        "narHash": "sha256-Xsh3d7rQY7RKzZ7J0swrgxZEyITb7B3oX5F/tcBGjfk=",
-        "owner": "AdnanHodzic",
-        "repo": "auto-cpufreq",
-        "rev": "a42e8fb51e08059411d52451141cac86f1bc788a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "AdnanHodzic",
-        "repo": "auto-cpufreq",
-        "type": "github"
-      }
-    },
     "brew-src": {
       "flake": false,
       "locked": {
@@ -62,11 +42,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1725831139,
-        "narHash": "sha256-9syY5nEehCswE8AMcjpUO4T0iX9nrNbzq69Kqcs92L0=",
+        "lastModified": 1725863249,
+        "narHash": "sha256-v5wzHOorcvLPkQDFEuvQG0q/TVIW948NMJxwMUK73WQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "8a175a89137fe798b33c476d4dae17dba5fb3fd3",
+        "rev": "77c94148285563113246eaf9f8df5488e00c81d0",
         "type": "github"
       },
       "original": {
@@ -94,11 +74,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1725838865,
-        "narHash": "sha256-0FvSMlnWSrEMrrKoRAv3ZaPBrbXaaTbLPv0KBqPreKo=",
+        "lastModified": 1725858373,
+        "narHash": "sha256-mc4F4EyYE3u9HCPW7zID+i52BAkDXp03BwJ5fRRluEs=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "368b38cf4fe38f979cb79d3182601a707c6522b0",
+        "rev": "b3c9a2c62a300b86bf68af5ef32dc0dad198bb70",
         "type": "github"
       },
       "original": {
@@ -110,11 +90,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1725835797,
-        "narHash": "sha256-OkLok4zbX8tP9jz9X2WbNo7z6CzOlln/FwF9hXP5mMg=",
+        "lastModified": 1725859312,
+        "narHash": "sha256-ctYG7lUlXaC6EAliPN0PXv/3m7+3gOQtb8JuNTS35a4=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "6ee6b02303f084815ac447e298d7e853a9d02fad",
+        "rev": "84bacde556c63ad0151d438957e4a34abee4ac78",
         "type": "github"
       },
       "original": {
@@ -246,7 +226,6 @@
     },
     "root": {
       "inputs": {
-        "auto-cpufreq": "auto-cpufreq",
         "home-manager": "home-manager",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
