@@ -1,4 +1,3 @@
-# configuration.nix
 
 {inputs, pkgs, ...}: {
     # ---Snip---
