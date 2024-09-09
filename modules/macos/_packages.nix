@@ -37,7 +37,6 @@
       "1password-cli"
       "1password"
       "betterdisplay"
-      "discord"
       "figma-agent"
       "rar"
       "raycast"
