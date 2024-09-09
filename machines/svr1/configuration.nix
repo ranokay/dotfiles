@@ -6,6 +6,7 @@
   imports = [
     inputs.impermanence.nixosModules.impermanence
     inputs.home-manager.nixosModules.home-manager
+    inputs.auto-cpufreq.nixosModules.auto-cpufreq
 
     ./hardware-configuration.nix
 
