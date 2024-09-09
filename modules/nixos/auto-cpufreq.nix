@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  services.auto-cpufreq = {
+  programs.auto-cpufreq = {
     enable = true;
     settings = {
       charger = {

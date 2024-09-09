@@ -67,9 +67,9 @@ in {
     ];
   };
 
-  environment.persistence."/nix/persist" = {
-    directories = [
-      "/var/lib/caddy"
-    ];
-  };
+  # environment.persistence."/nix/persist" = {
+  #   directories = [
+  #     "/var/lib/caddy"
+  #   ];
+  # };
 }
