@@ -1,18 +1,21 @@
-{ config, pkgs, ... }:
-
-let
-  caddyWithPlugins = pkgs.caddy.override {
-    buildGoModule = args: pkgs.buildGoModule (args // {
-      vendorSha256 = null;
-      overrideModAttrs = _: {
-        postBuild = ''
-          go install github.com/caddy-dns/cloudflare@latest
-        '';
-      };
-    });
-  };
-in
 {
+  config,
+  pkgs,
+  ...
+}: let
+  caddyWithPlugins = pkgs.caddy.override {
+    buildGoModule = args:
+      pkgs.buildGoModule (args
+        // {
+          vendorSha256 = null;
+          overrideModAttrs = _: {
+            postBuild = ''
+              go install github.com/caddy-dns/cloudflare@latest
+            '';
+          };
+        });
+  };
+in {
   services.caddy = {
     enable = true;
     package = caddyWithPlugins;
@@ -50,7 +53,7 @@ in
     '';
   };
 
-  environment.systemPackages = [ caddyWithPlugins ];
+  environment.systemPackages = [caddyWithPlugins];
 
   sops.secrets = {
     cloudflare_zone_key = {};
