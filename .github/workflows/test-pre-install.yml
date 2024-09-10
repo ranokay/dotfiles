@@ -15,6 +15,11 @@ jobs:
 
       - uses: cachix/install-nix-action@v27
 
+      - name: Install Nix
+        run: |
+          nix_bin=$(which nix)
+          sudo $nix_bin run nixpkgs#bash "bash --version"
+
       - name: Test Pre-Install Script
         run: |
           chmod +x ./pre-install.sh
