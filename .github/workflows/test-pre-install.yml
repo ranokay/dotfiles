@@ -24,6 +24,9 @@ jobs:
           sudo fallocate -l 1G /tmp/mockdisk.img
           LOOP_DEVICE=$(sudo losetup --find --show /tmp/mockdisk.img)
           echo $LOOP_DEVICE > loop_device.txt
+          sudo partprobe $LOOP_DEVICE
+          sleep 5
+          lsblk
 
       - name: Run Pre-Install Script
         run: |
