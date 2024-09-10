@@ -16,9 +16,13 @@ jobs:
       - name: Source Nix profile
         run: . /home/runner/.nix-profile/etc/profile.d/nix.sh
 
-      - name: Run pre-install script for NixOS
+      - name: Enter Nix shell
+        run: nix-shell -p nixos-generators --run "echo 'Entered Nix shell'"
+
+      - name: Debug pre-install script
         run: |
           chmod +x pre-install.sh
+          set -x  # Enable script debugging
           ./pre-install.sh
         env:
           DISK: /dev/sda
