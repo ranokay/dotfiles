@@ -1,0 +1,24 @@
+name: Test NixOS Pre-Install Script
+
+on:
+  workflow_dispatch: null
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Install dependencies (QEMU, virtme, etc.)
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-kvm qemu virtme parted
+
+      # Run the pre-install script in a virtual machine
+      - name: Run Pre-Install Script in VM
+        run: |
+          chmod +x ./pre-install.sh
+          virtme-run --kdir /lib/modules/$(uname -r)/build --memory 512M --script ./pre-install.sh

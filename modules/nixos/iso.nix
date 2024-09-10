@@ -13,7 +13,7 @@
   };
 
   programs.bash.shellAliases = {
-    install = "sudo bash -c \"$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/install.sh)\"";
+    install = "sudo bash -c \"$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/pre-install.sh)\"";
   };
 
   security.sudo.wheelNeedsPassword = false;

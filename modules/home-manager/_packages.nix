@@ -22,7 +22,7 @@
           # devenv
           # doppler
           # flyctl
-          # just
+          just
           # nil
           nixos-rebuild # need for macOS
           nodejs

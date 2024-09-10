@@ -5,7 +5,6 @@
   dotfiles
 - 🍎 [nix-darwin](https://github.com/LnL7/nix-darwin) manages MacBook
 - 🤫 [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
-- 🔑 Remote initrd unlock system to decrypt drives on boot
 - 🌬️ Root on tmpfs aka
   [impermanence](https://grahamc.com/blog/erase-your-darlings/)
 - 🔒 Automatic Let's Encrypt certificate registration and renewal

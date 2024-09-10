@@ -10,7 +10,6 @@
     ./hardware-configuration.nix
 
     ./../../modules/nixos/base.nix
-    ./../../modules/nixos/remote-unlock.nix
     ./../../modules/nixos/auto-update.nix
 
     ./../../services/caddy.nix
