@@ -1,3 +1,4 @@
+---
 name: "Release Custom NixOS ISO"
 
 on:
