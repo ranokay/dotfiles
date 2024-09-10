@@ -9,16 +9,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: cachix/install-nix-action@v27
+      - uses: actions/checkout@v4
 
       - name: Install Nix
-        run: |
-          nix_bin=$(which nix)
-          sudo $nix_bin run nixpkgs#bash "bash --version"
+      - uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - run: nix-build
 
       - name: Test Pre-Install Script
         run: |
