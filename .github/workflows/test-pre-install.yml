@@ -8,19 +8,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Install dependencies (QEMU, virtme, etc.)
+      - uses: cachix/install-nix-action@v27
+
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-kvm qemu virtme parted
+          sudo apt-get install -y bat
 
-      # Run the pre-install script in a virtual machine
-      - name: Run Pre-Install Script in VM
+      - name: Test Pre-Install Script
         run: |
-          chmod +x ./pre-install.sh
-          virtme-run --kdir /lib/modules/$(uname -r)/build --memory 512M --script ./pre-install.sh
+          sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/pre-install.sh)"
