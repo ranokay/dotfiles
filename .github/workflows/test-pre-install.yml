@@ -19,11 +19,6 @@ jobs:
 
       - uses: cachix/install-nix-action@v27
 
-      - name: Setup Mock Disk
-        run: |
-          sudo fallocate -l 1G /tmp/mockdisk.img
-          sudo losetup /dev/loop0 /tmp/mockdisk.img
-
       - name: Run Pre-Install Script
         run: |
           sudo bash pre-install.sh <<EOF
@@ -31,8 +26,3 @@ jobs:
           /dev/loop0
           y
           EOF
-
-      - name: Cleanup
-        run: |
-          sudo losetup -d /dev/loop0
-          sudo rm /tmp/mockdisk.img
