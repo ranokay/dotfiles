@@ -1,4 +1,4 @@
-name: Test Pre-Install Script
+name: "Test Pre-Install Script"
 
 on:
   workflow_dispatch: null
@@ -8,17 +8,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - uses: cachix/install-nix-action@v27
 
-      - name: Install Dependencies
+      - name: Install Nix
         run: |
-          sudo apt-get update
-          sudo apt-get install -y bat
+          nix_bin=$(which nix)
+          sudo $nix_bin run nixpkgs#bash -c "bash --version"
 
       - name: Test Pre-Install Script
         run: |
-          sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/pre-install.sh)"
+          chmod +x ./pre-install.sh
+          ./pre-install.sh
+
+      - name: Upload Logs (for debugging)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: ./pre-install.log
