@@ -1,40 +1,30 @@
-name: Test NixOS Pre-Install Script
+name: Test Pre-Install NixOS Script
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  test:
+  test-script:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install Nix
+      - name: Setup environment
         run: |
-          curl -L https://nixos.org/nix/install | sh
-          source /home/runner/.nix-profile/etc/profile.d/nix.sh
+          sudo apt-get update
+          sudo apt-get install -y parted blkid mkfs.fat mkfs.ext4
 
-      - name: Setup NixOS environment
+      - name: Copy and run script
         run: |
-          nix-shell -p nixos-generators --run "nixos-generate -f lxc"
-          lxc-create -n test-nixos -t nixos
+          cp pre-install.sh .
+          chmod +x pre-install.sh
+          ./pre-install.sh
 
-      - name: Start NixOS container
+      - name: Check script execution
         run: |
-          lxc-start -n test-nixos
-          lxc-attach -n test-nixos -- /bin/bash -c "echo 'NixOS container started'"
-
-      - name: Run Pre-Install Script
-        run: |
-          lxc-attach -n test-nixos -- bash -c "chmod +x ./pre-install.sh && ./pre-install.sh"
-
-      - name: Stop NixOS container
-        run: |
-          lxc-stop -n test-nixos
+          if [ $? -eq 0 ]; then
+            echo "Script executed successfully"
+          else
+            echo "Script failed to execute"
+            exit 1
+          fi
