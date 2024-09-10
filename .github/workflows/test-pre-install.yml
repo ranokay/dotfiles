@@ -1,33 +1,25 @@
-name: Test Pre-Install NixOS Script
+name: Test NixOS Pre-Install Script
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch: # Allows manual triggering of the workflow
+on: [push, pull_request]
 
 jobs:
-  test-script:
+  test-nixos:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Setup environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y parted blkid mkfs.fat mkfs.ext4
+      - name: Install Nix
+        run: curl -L https://nixos.org/nix/install | sh
 
-      - name: Copy and run script
+      - name: Source Nix profile
+        run: . /home/runner/.nix-profile/etc/profile.d/nix.sh
+
+      - name: Run pre-install script for NixOS
         run: |
-          cp pre-install.sh .
           chmod +x pre-install.sh
           ./pre-install.sh
-
-      - name: Check script execution
-        run: |
-          if [ $? -eq 0 ]; then
-            echo "Script executed successfully"
-          else
-            echo "Script failed to execute"
-            exit 1
-          fi
+        env:
+          DISK: /dev/sda
+          REPLY: y
