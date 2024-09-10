@@ -1,4 +1,4 @@
-name: Test NixOS Pre-Install Script
+name: Test Pre-Install Script
 
 on:
   workflow_dispatch: null

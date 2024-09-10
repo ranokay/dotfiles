@@ -1,5 +1,5 @@
 ---
-name: "Release custom NixOS ISO"
+name: "Release Custom NixOS ISO"
 
 on:
   push:
