@@ -14,20 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Nix
+      - name: Set up Nix environment
         uses: cachix/install-nix-action@v22
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Install required packages
         run: |
-          nix-env -iA \
-            nixos.parted \
-            nixos.util-linux \
-            nixos.e2fsprogs \
-            nixos.dosfstools \
-            nixos.nixos-install-tools \
-            -f https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz
+          nix-channel --update
+          nix-env -iA nixpkgs.parted nixpkgs.util-linux nixpkgs.e2fsprogs nixpkgs.dosfstools
 
       - name: Create virtual disk
         run: |
@@ -37,7 +32,7 @@ jobs:
       - name: Run pre-install script
         run: |
           chmod +x pre-install.sh
-          echo -e "/dev/loop0\ny\ny\ny" | sudo -E PATH=$PATH ./pre-install.sh
+          echo -e "/dev/loop0\ny\ny\ny" | sudo ./pre-install.sh
 
       - name: Verify partitions
         run: |
