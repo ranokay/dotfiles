@@ -1,62 +1,43 @@
-name: Test NixOS Pre-Install Script
+name: Test Pre-Install NixOS Script
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  test-nixos-script:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Set up Nix environment
-        uses: cachix/install-nix-action@v22
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
-      - name: Install required packages
-        run: |
-          nix-channel --update
-          nix-env -iA \
-            nixos.parted \
-            nixos.util-linux \
-            nixos.e2fsprogs \
-            nixos.dosfstools \
-            nixos.nixos-install-tools \
-            -f https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz
-
-      - name: Create virtual disk
-        run: |
-          sudo truncate -s 4G /tmp/nixos-disk.img
-          sudo losetup /dev/loop0 /tmp/nixos-disk.img
-
-      - name: Run pre-install script
+      - name: Make Script Executable
         run: |
           chmod +x pre-install.sh
-          echo -e "/dev/loop0\ny\ny\ny" | sudo -E PATH=$PATH ./pre-install.sh
 
-      - name: Verify partitions
+      - name: Run Script
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo lsblk /dev/loop0
-          sudo blkid /dev/loop0p1
-          sudo blkid /dev/loop0p2
+          ./pre-install.sh
 
-      - name: Check mounted filesystems
+      - name: Verify Disk Partitioning
         run: |
-          mount | grep /mnt
+          lsblk
+          test -b /dev/nvme0n1p1
+          test -b /dev/nvme0n1p2
 
-      - name: Verify hardware configuration
+      - name: Verify Filesystem Creation
         run: |
-          sudo test -f /mnt/etc/nixos/hardware-configuration.nix
+          blkid -s UUID -o value /dev/nvme0n1p1
+          blkid -s UUID -o value /dev/nvme0n1p2
 
-      - name: Clean up
-        if: always()
+      - name: Verify Mounting
         run: |
-          sudo umount /mnt/boot || true
-          sudo umount /mnt || true
-          sudo losetup -d /dev/loop0 || true
+          mount | grep /dev/nvme0n1p2
+          mount | grep /dev/nvme0n1p1
+
+      - name: Verify Hardware Configuration Generation
+        run: |
+          test -f /mnt/etc/nixos/hardware-configuration.nix
