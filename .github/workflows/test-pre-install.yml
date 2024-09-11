@@ -1,5 +1,3 @@
-name: "Test Pre-Install NixOS Script"
-
 on:
   push:
     branches:
@@ -24,6 +22,7 @@ jobs:
           sudo fallocate -l 1G /tmp/mockdisk.img
           LOOP_DEVICE=$(sudo losetup --find --show /tmp/mockdisk.img)
           echo $LOOP_DEVICE > loop_device.txt
+          sudo parted $LOOP_DEVICE --script mklabel gpt mkpart primary ext4 0% 100%
           sudo partprobe $LOOP_DEVICE
           sleep 5
           lsblk
