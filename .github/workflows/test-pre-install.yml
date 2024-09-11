@@ -9,38 +9,35 @@ on:
 jobs:
   test-nixos-script:
     runs-on: ubuntu-latest
-    container:
-      image: nixos/nix
-      options: --privileged
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up NixOS environment
-        run: |
-          nix-channel --add https://nixos.org/channels/nixos-unstable nixos
-          nix-channel --update
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Install required packages
         run: |
-          nix-env -iA nixos.parted nixos.util-linux nixos.e2fsprogs nixos.dosfstools
+          nix-env -iA nixpkgs.parted nixpkgs.util-linux nixpkgs.e2fsprogs nixpkgs.dosfstools
 
       - name: Create virtual disk
         run: |
-          truncate -s 4G /tmp/nixos-disk.img
-          losetup /dev/loop0 /tmp/nixos-disk.img
+          sudo truncate -s 4G /tmp/nixos-disk.img
+          sudo losetup /dev/loop0 /tmp/nixos-disk.img
 
       - name: Run pre-install script
         run: |
           chmod +x pre-install.sh
-          echo -e "/dev/loop0\ny\ny\ny" | ./pre-install.sh
+          echo -e "/dev/loop0\ny\ny\ny" | sudo ./pre-install.sh
 
       - name: Verify partitions
         run: |
-          lsblk /dev/loop0
-          blkid /dev/loop0p1
-          blkid /dev/loop0p2
+          sudo lsblk /dev/loop0
+          sudo blkid /dev/loop0p1
+          sudo blkid /dev/loop0p2
 
       - name: Check mounted filesystems
         run: |
@@ -48,11 +45,11 @@ jobs:
 
       - name: Verify hardware configuration
         run: |
-          test -f /mnt/etc/nixos/hardware-configuration.nix
+          sudo test -f /mnt/etc/nixos/hardware-configuration.nix
 
       - name: Clean up
         if: always()
         run: |
-          umount /mnt/boot || true
-          umount /mnt || true
-          losetup -d /dev/loop0 || true
+          sudo umount /mnt/boot || true
+          sudo umount /mnt || true
+          sudo losetup -d /dev/loop0 || true
