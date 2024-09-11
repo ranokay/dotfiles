@@ -1,44 +1,58 @@
+name: Test NixOS Pre-Install Script
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  test:
+  test-nixos-script:
     runs-on: ubuntu-latest
+    container:
+      image: nixos/nix
+      options: --privileged
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - uses: cachix/install-nix-action@v27
-
-      - name: Setup Mock Disk
+      - name: Set up NixOS environment
         run: |
-          sudo fallocate -l 1G /tmp/mockdisk.img
-          LOOP_DEVICE=$(sudo losetup --find --show /tmp/mockdisk.img)
-          echo $LOOP_DEVICE > loop_device.txt
-          sudo parted $LOOP_DEVICE --script mklabel gpt mkpart primary ext4 0% 100%
-          sudo partprobe $LOOP_DEVICE
-          sleep 5
-          lsblk
+          nix-channel --add https://nixos.org/channels/nixos-unstable nixos
+          nix-channel --update
 
-      - name: Run Pre-Install Script
+      - name: Install required packages
         run: |
-          LOOP_DEVICE=$(cat loop_device.txt)
-          sudo bash pre-install.sh <<EOF
-          y
-          $LOOP_DEVICE
-          y
-          EOF
+          nix-env -iA nixos.parted nixos.util-linux nixos.e2fsprogs nixos.dosfstools
 
-      - name: Cleanup
+      - name: Create virtual disk
         run: |
-          LOOP_DEVICE=$(cat loop_device.txt)
-          sudo losetup -d $LOOP_DEVICE
-          sudo rm /tmp/mockdisk.img
-          rm loop_device.txt
+          truncate -s 4G /tmp/nixos-disk.img
+          losetup /dev/loop0 /tmp/nixos-disk.img
+
+      - name: Run pre-install script
+        run: |
+          chmod +x pre-install.sh
+          echo -e "/dev/loop0\ny\ny\ny" | ./pre-install.sh
+
+      - name: Verify partitions
+        run: |
+          lsblk /dev/loop0
+          blkid /dev/loop0p1
+          blkid /dev/loop0p2
+
+      - name: Check mounted filesystems
+        run: |
+          mount | grep /mnt
+
+      - name: Verify hardware configuration
+        run: |
+          test -f /mnt/etc/nixos/hardware-configuration.nix
+
+      - name: Clean up
+        if: always()
+        run: |
+          umount /mnt/boot || true
+          umount /mnt || true
+          losetup -d /dev/loop0 || true
