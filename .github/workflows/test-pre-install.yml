@@ -22,7 +22,13 @@ jobs:
       - name: Install required packages
         run: |
           nix-channel --update
-          nix-env -iA nixpkgs.parted nixpkgs.util-linux nixpkgs.e2fsprogs nixpkgs.dosfstools
+          nix-env -iA \
+            nixos.parted \
+            nixos.util-linux \
+            nixos.e2fsprogs \
+            nixos.dosfstools \
+            nixos.nixos-install-tools \
+            -f https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz
 
       - name: Create virtual disk
         run: |
@@ -32,7 +38,7 @@ jobs:
       - name: Run pre-install script
         run: |
           chmod +x pre-install.sh
-          echo -e "/dev/loop0\ny\ny\ny" | sudo ./pre-install.sh
+          echo -e "/dev/loop0\ny\ny\ny" | sudo -E PATH=$PATH ./pre-install.sh
 
       - name: Verify partitions
         run: |
