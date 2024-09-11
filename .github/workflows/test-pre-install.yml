@@ -1,33 +1,53 @@
-name: NixOS Pre-Install Test
+name: Test NixOS Pre-Install Script
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  test-pre-install:
+  test-nixos-pre-install:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nixos-version: [unstable, 24.05]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup NixOS
-        uses: NixOS/installer-action@v1
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
-          nixos-version: ${{ matrix.nixos-version }}
-      - name: Install dependencies
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Set up mock environment
         run: |
-          sudo apt update
-          sudo apt install -y bash
+          sudo apt-get update
+          sudo apt-get install -y parted fdisk
+          sudo truncate -s 10G testdisk.img
+          sudo losetup /dev/loop0 testdisk.img
+          echo '/dev/loop0' > diskfile
+
       - name: Run pre-install script
         run: |
-          bash pre-install.sh
-      - name: Check for errors
+          chmod +x pre-install.sh
+          sudo ./pre-install.sh < <(echo -e "y\n/dev/loop0\ny\n")
+
+      - name: Verify partitions
         run: |
-          if [ $? -ne 0 ]; then
-            echo "Pre-install script failed!"
-            exit 1
-          fi
+          sudo fdisk -l /dev/loop0
+          sudo blkid /dev/loop0p1
+          sudo blkid /dev/loop0p2
+
+      - name: Verify mounts
+        run: |
+          mount | grep /mnt
+
+      - name: Check NixOS configuration
+        run: |
+          ls -l /mnt/etc/nixos/
+          cat /mnt/etc/nixos/hardware-configuration.nix
+
+      - name: Clean up
+        if: always()
+        run: |
+          sudo umount /mnt/boot || true
+          sudo umount /mnt || true
+          sudo losetup -d /dev/loop0 || true
