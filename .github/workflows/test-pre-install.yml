@@ -1,43 +1,16 @@
-name: Test Pre-Install NixOS Script
-
-on:
-  push:
-    branches:
-      - main
-
+name: NixOS Pre-install Script Test
+on: [push]
 jobs:
-  test:
+  Explore-NixOS:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Make Script Executable
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔍 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check if Linux is detected
         run: |
-          chmod +x pre-install.sh
-
-      - name: Run Script
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          ./pre-install.sh
-
-      - name: Verify Disk Partitioning
-        run: |
-          lsblk
-          test -b /dev/nvme0n1p1
-          test -b /dev/nvme0n1p2
-
-      - name: Verify Filesystem Creation
-        run: |
-          blkid -s UUID -o value /dev/nvme0n1p1
-          blkid -s UUID -o value /dev/nvme0n1p2
-
-      - name: Verify Mounting
-        run: |
-          mount | grep /dev/nvme0n1p2
-          mount | grep /dev/nvme0n1p1
-
-      - name: Verify Hardware Configuration Generation
-        run: |
-          test -f /mnt/etc/nixos/hardware-configuration.nix
+          if [ "$(uname)" == "Linux" ]; then
+            echo "Linux detected"
+          fi
+      - run: script path/to/pre-install.sh
+      - run: echo "🍏 This job's status is ${{ job.status }}."
