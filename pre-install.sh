@@ -110,14 +110,6 @@ elif [ "$(uname)" == "Linux" ]; then
     exit 1
   fi
 
-  print_header "Generating Hardware Configuration"
-  if nixos-generate-config --root /mnt; then
-    print_colored "$GREEN" "Hardware configuration generated successfully."
-  else
-    print_colored "$RED" "Error generating hardware configuration."
-    exit 1
-  fi
-
   print_colored "$GREEN" "All steps completed successfully. NixOS is now ready to be installed."
   echo -e "\nTo install NixOS configuration for your hostname, run the following command:"
   print_colored "$YELLOW" "sudo nixos-install --no-root-passwd --flake github:ranokay/dotfiles#hostname"
