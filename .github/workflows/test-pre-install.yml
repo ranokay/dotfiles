@@ -12,5 +12,5 @@ jobs:
           if [ "$(uname)" == "Linux" ]; then
             echo "Linux detected"
           fi
-      - run: script path/to/pre-install.sh
+      - run: script ./pre-install.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
