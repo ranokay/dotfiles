@@ -1,16 +1,33 @@
-name: NixOS Pre-install Script Test
-on: [push]
+name: NixOS Pre-Install Test
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  Explore-NixOS:
+  test-pre-install:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nixos-version: [unstable, 24.05]
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔍 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check if Linux is detected
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup NixOS
+        uses: NixOS/installer-action@v1
+        with:
+          nixos-version: ${{ matrix.nixos-version }}
+      - name: Install dependencies
         run: |
-          if [ "$(uname)" == "Linux" ]; then
-            echo "Linux detected"
+          sudo apt update
+          sudo apt install -y bash
+      - name: Run pre-install script
+        run: |
+          bash pre-install.sh
+      - name: Check for errors
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "Pre-install script failed!"
+            exit 1
           fi
-      - run: script ./pre-install.sh
-      - run: echo "🍏 This job's status is ${{ job.status }}."
