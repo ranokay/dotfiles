@@ -22,19 +22,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y parted fdisk
           sudo truncate -s 10G testdisk.img
-          sudo losetup /dev/loop0 testdisk.img
-          echo '/dev/loop0' > diskfile
+          LOOP_DEVICE=$(sudo losetup -f)
+          sudo losetup $LOOP_DEVICE testdisk.img
+          echo $LOOP_DEVICE > diskfile
 
       - name: Run pre-install script
         run: |
           chmod +x pre-install.sh
-          sudo ./pre-install.sh < <(echo -e "y\n/dev/loop0\ny\n")
+          DISK=$(cat diskfile)
+          sudo ./pre-install.sh < <(echo -e "y\n$DISK\ny\n")
 
       - name: Verify partitions
         run: |
-          sudo fdisk -l /dev/loop0
-          sudo blkid /dev/loop0p1
-          sudo blkid /dev/loop0p2
+          DISK=$(cat diskfile)
+          sudo fdisk -l $DISK
+          sudo blkid ${DISK}p1
+          sudo blkid ${DISK}p2
 
       - name: Verify mounts
         run: |
@@ -50,4 +53,5 @@ jobs:
         run: |
           sudo umount /mnt/boot || true
           sudo umount /mnt || true
-          sudo losetup -d /dev/loop0 || true
+          DISK=$(cat diskfile)
+          sudo losetup -d $DISK || true
