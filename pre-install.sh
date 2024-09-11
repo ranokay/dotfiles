@@ -59,14 +59,20 @@ if [ "$(uname)" == "Darwin" ]; then
 
 elif [ "$(uname)" == "Linux" ]; then
   print_colored "$YELLOW" "Linux detected"
-  confirm "This script will prepare the system for NixOS installation. Do you want to continue?"
+
+  # Check if disk argument is provided
+  if [ "$#" -ne 1 ]; then
+    print_colored "$RED" "Error: Please provide the disk as an argument (e.g., /dev/loop0)"
+    exit 1
+  fi
+
+  DISK=$1
 
   print_header "Available Disks"
   lsblk
-  read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
 
   print_header "Verifying Disk"
-  confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
+  print_colored "$YELLOW" "Selected disk: $DISK"
 
   print_header "Partitioning Disk"
   if parted $DISK -- mklabel gpt &&

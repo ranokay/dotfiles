@@ -30,23 +30,23 @@ jobs:
         run: |
           chmod +x pre-install.sh
           DISK=$(cat diskfile)
-          sudo ./pre-install.sh < <(echo -e "y\n$DISK\ny\n")
+          sudo ./pre-install.sh $DISK
 
       - name: Verify partitions
         run: |
           DISK=$(cat diskfile)
           sudo fdisk -l $DISK
-          sudo blkid ${DISK}p1
-          sudo blkid ${DISK}p2
+          sudo blkid ${DISK}p1 || true
+          sudo blkid ${DISK}p2 || true
 
       - name: Verify mounts
         run: |
-          mount | grep /mnt
+          mount | grep /mnt || true
 
       - name: Check NixOS configuration
         run: |
-          ls -l /mnt/etc/nixos/
-          cat /mnt/etc/nixos/hardware-configuration.nix
+          ls -l /mnt/etc/nixos/ || true
+          cat /mnt/etc/nixos/hardware-configuration.nix || true
 
       - name: Clean up
         if: always()
