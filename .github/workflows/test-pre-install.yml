@@ -17,9 +17,7 @@ jobs:
         uses: cachix/install-nix-action@v27
 
       - name: Set up test environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y parted gdisk
+        run: sudo apt-get update
 
       - name: Create test disk image
         run: |
@@ -36,7 +34,7 @@ jobs:
 
       - name: Run pre-install script
         run: |
-          sudo bash pre-install.sh
+          sudo bash pre-install.sh --disk ${{ env.LOOP_DEVICE }} --auto-confirm
 
       - name: Verify partitions and filesystems
         run: |
