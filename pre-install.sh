@@ -24,12 +24,36 @@ print_header() {
 
 # Function to prompt for confirmation
 confirm() {
+  if $AUTOCONFIRM; then
+    return 0
+  fi
   read -p "$1 (y/n) " -n 1 -r
   echo
   if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
   fi
 }
+
+# Parse command-line arguments
+DISK=""
+AUTOCONFIRM=false
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --disk)
+    DISK="$2"
+    shift 2
+    ;;
+  --auto-confirm)
+    AUTOCONFIRM=true
+    shift
+    ;;
+  *)
+    echo "Unknown option: $1"
+    exit 1
+    ;;
+  esac
+done
 
 if [ "$(uname)" == "Darwin" ]; then
   print_colored "$YELLOW" "macOS detected"
@@ -59,20 +83,16 @@ if [ "$(uname)" == "Darwin" ]; then
 
 elif [ "$(uname)" == "Linux" ]; then
   print_colored "$YELLOW" "Linux detected"
+  confirm "This script will prepare the system for NixOS installation. Do you want to continue?"
 
-  # Check if disk argument is provided
-  if [ "$#" -ne 1 ]; then
-    print_colored "$RED" "Error: Please provide the disk as an argument (e.g., /dev/loop0)"
-    exit 1
+  if [ -z "$DISK" ]; then
+    print_header "Available Disks"
+    lsblk
+    read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
   fi
 
-  DISK=$1
-
-  print_header "Available Disks"
-  lsblk
-
   print_header "Verifying Disk"
-  print_colored "$YELLOW" "Selected disk: $DISK"
+  confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
 
   print_header "Partitioning Disk"
   if parted $DISK -- mklabel gpt &&
@@ -113,4 +133,7 @@ elif [ "$(uname)" == "Linux" ]; then
   print_colored "$GREEN" "All steps completed successfully. NixOS is now ready to be installed."
   echo -e "\nTo install NixOS configuration for your hostname, run the following command:"
   print_colored "$YELLOW" "sudo nixos-install --no-root-passwd --flake github:ranokay/dotfiles#hostname"
+else
+  print_colored "$RED" "Unsupported operating system."
+  exit 1
 fi
