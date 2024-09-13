@@ -116,9 +116,20 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- mkpart ESP fat32 1MiB 512MiB &&
     parted $DISK -- set 1 boot on &&
     parted $DISK -- mkpart Nix 512MiB 100%; then
+    sync # Ensure changes are flushed to disk
     print_colored "$GREEN" "Disk partitioned successfully."
+    print_colored "$GREEN" "Disk labeled as $DISK"
+    print_colored "$GREEN" "Partitions created:"
+    print_colored "$GREEN" "ESP: $PART1"
+    print_colored "$GREEN" "NIX: $PART2"
   else
     print_colored "$RED" "Error partitioning disk."
+    exit 1
+  fi
+
+  # Check disk labeling to verify partitions were created
+  if ! lsblk | grep -q "${PART1}"; then
+    print_colored "$RED" "Partition ${PART1} not found."
     exit 1
   fi
 
