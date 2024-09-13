@@ -17,21 +17,16 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v27
 
-      - name: Set up test environment
-        run: sudo apt-get update
-
       - name: Create test disk image
         run: |
           dd if=/dev/zero of=testdisk.img bs=1M count=1024
           sudo losetup -f testdisk.img
           LOOP_DEVICE=$(sudo losetup -j testdisk.img | cut -d':' -f1)
+          if [ -z "$LOOP_DEVICE" ]; then
+            echo "Failed to create loop device"
+            exit 1
+          fi
           echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
-
-      - name: Modify pre-install script for testing
-        run: |
-          sed -i 's/read -p "Enter the disk to partition (e.g., \/dev\/nvme0n1): " DISK/DISK=$LOOP_DEVICE/' pre-install.sh
-          sed -i 's/confirm "Are you sure you want to format $DISK? This will erase all data on the disk."/echo "Confirmed disk formatting for testing"/' pre-install.sh
-          sed -i 's/confirm "This script will prepare the system for NixOS installation. Do you want to continue?"/echo "Confirmed NixOS installation preparation for testing"/' pre-install.sh
 
       - name: Run pre-install script
         run: |

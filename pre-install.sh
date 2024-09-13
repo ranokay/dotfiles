@@ -117,10 +117,6 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- set 1 boot on &&
     parted $DISK -- mkpart Nix 512MiB 100%; then
     print_colored "$GREEN" "Disk partitioned successfully."
-    print_colored "$GREEN" "Disk labeled as $DISK"
-    print_colored "$GREEN" "Partitions created:"
-    print_colored "$GREEN" "ESP: $PART1"
-    print_colored "$GREEN" "NIX: $PART2"
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
