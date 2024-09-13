@@ -115,16 +115,10 @@ elif [ "$(uname)" == "Linux" ]; then
 
   print_header "Creating Filesystems"
   if mkfs.fat -F32 -n BOOT ${DISK}p1 && mkfs.ext4 -F -L NIX ${DISK}p2; then
-    sync # Ensure filesystems are created properly
+    sync
     print_colored "$GREEN" "Filesystems created successfully."
   else
     print_colored "$RED" "Error creating filesystems."
-    exit 1
-  fi
-
-  # Check disk labeling to verify partitions were created
-  if ! lsblk | grep -q "${DISK}p1"; then
-    print_colored "$RED" "Partition ${DISK}p1 not found."
     exit 1
   fi
 
