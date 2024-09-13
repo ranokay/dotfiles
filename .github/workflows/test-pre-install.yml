@@ -20,25 +20,25 @@ jobs:
         run: |
           dd if=/dev/zero of=testdisk.img bs=1M count=1024
           sudo losetup -f testdisk.img
-          DISK=$(sudo losetup -j testdisk.img | cut -d':' -f1)
-          if [ -z "$DISK" ]; then
+          LOOP_DEVICE=$(sudo losetup -j testdisk.img | cut -d':' -f1)
+          if [ -z "$LOOP_DEVICE" ]; then
             echo "Failed to create loop device"
             exit 1
           fi
-          echo "DISK=$DISK" >> $GITHUB_ENV
+          echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
 
       - name: Run pre-install script with auto-confirm and loop device
         run: |
-          sudo bash pre-install.sh --disk ${{ env.DISK }} --auto-confirm
+          sudo bash pre-install.sh --disk ${{ env.LOOP_DEVICE }} --auto-confirm
 
       - name: Verify partitions and filesystems
         run: |
-          sudo fdisk -l ${{ env.DISK }}
-          sudo blkid ${DISK}p1
-          sudo blkid ${DISK}p2
+          sudo fdisk -l ${{ env.LOOP_DEVICE }}
+          sudo blkid ${LOOP_DEVICE}p1
+          sudo blkid ${LOOP_DEVICE}p2
 
       - name: Clean up
         run: |
           sudo umount /mnt/boot || true
           sudo umount /mnt || true
-          sudo losetup -d ${{ env.DISK }}
+          sudo losetup -d ${{ env.LOOP_DEVICE }}
