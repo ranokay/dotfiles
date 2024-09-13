@@ -96,6 +96,9 @@ elif [ "$(uname)" == "Linux" ]; then
     print_header "Available Disks"
     lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -w disk
     read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
+
+    print_header "Verifying Disk"
+    confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
   fi
 
   # Dynamic partition name based on disk type (nvme or regular)
@@ -106,9 +109,6 @@ elif [ "$(uname)" == "Linux" ]; then
     PART1="${DISK}1"
     PART2="${DISK}2"
   fi
-
-  print_header "Verifying Disk"
-  confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
 
   # Partitioning the disk
   print_header "Partitioning Disk"

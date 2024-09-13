@@ -16,6 +16,9 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v27
 
+      - name: Set up test environment
+        run: sudo apt-get update
+
       - name: Create test disk image
         run: |
           dd if=/dev/zero of=testdisk.img bs=1M count=1024
