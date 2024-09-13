@@ -103,8 +103,8 @@ elif [ "$(uname)" == "Linux" ]; then
     PART1="${DISK}p1"
     PART2="${DISK}p2"
   elif [[ $DISK =~ "loop" ]]; then
-    PART1="${DISK}p1"
-    PART2="${DISK}p2"
+    PART1="${DISK}"
+    PART2="${DISK}"
   else
     PART1="${DISK}1"
     PART2="${DISK}2"
@@ -121,10 +121,6 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- mkpart Nix 512MiB 100%; then
     sync # Ensure changes are flushed to disk
     print_colored "$GREEN" "Disk partitioned successfully."
-
-    # Force re-reading of the partition table
-    print_header "Refreshing partition table"
-    partprobe $DISK
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
