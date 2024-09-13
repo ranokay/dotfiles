@@ -99,7 +99,7 @@ elif [ "$(uname)" == "Linux" ]; then
   fi
 
   # Dynamic partition name based on disk type (nvme or regular)
-  if [[ $DISK =~ "nvme" ]]; then
+  if [[ $DISK =~ "nvme" ]] || [[ $DISK =~ "loop" ]]; then
     PART1="${DISK}p1"
     PART2="${DISK}p2"
   else
