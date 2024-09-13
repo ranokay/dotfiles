@@ -60,7 +60,7 @@ jobs:
           if ! sudo blkid ${LOOP_DEVICE}p2 | grep -q "TYPE=\"ext4\""; then
             echo "ext4 filesystem not found on Linux filesystem partition"
             exit 1
-          }
+          fi
 
       - name: Test mounting
         run: |
