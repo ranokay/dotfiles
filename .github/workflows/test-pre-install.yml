@@ -1,7 +1,15 @@
 name: "Test Pre-install Script"
 
 on:
-  workflow_dispatch: null
+  push:
+    paths:
+      - "pre-install.sh"
+      - ".github/workflows/test-pre-install.yml"
+  pull_request:
+    paths:
+      - "pre-install.sh"
+      - ".github/workflows/test-pre-install.yml"
+  workflow_dispatch:
 
 jobs:
   test-pre-install-script:
@@ -34,9 +42,46 @@ jobs:
           sudo blkid ${LOOP_DEVICE}p1
           sudo blkid ${LOOP_DEVICE}p2
 
+          # Check if partitions are created correctly
+          if ! sudo fdisk -l ${{ env.LOOP_DEVICE }} | grep -q "${LOOP_DEVICE}p1.*EFI System"; then
+            echo "EFI System partition not found"
+            exit 1
+          fi
+          if ! sudo fdisk -l ${{ env.LOOP_DEVICE }} | grep -q "${LOOP_DEVICE}p2.*Linux filesystem"; then
+            echo "Linux filesystem partition not found"
+            exit 1
+          fi
+
+          # Check if filesystems are created correctly
+          if ! sudo blkid ${LOOP_DEVICE}p1 | grep -q "TYPE=\"vfat\""; then
+            echo "FAT32 filesystem not found on EFI System partition"
+            exit 1
+          fi
+          if ! sudo blkid ${LOOP_DEVICE}p2 | grep -q "TYPE=\"ext4\""; then
+            echo "ext4 filesystem not found on Linux filesystem partition"
+            exit 1
+          }
+
+      - name: Test mounting
+        run: |
+          sudo mkdir -p /mnt
+          sudo mount ${LOOP_DEVICE}p2 /mnt
+          sudo mkdir -p /mnt/boot
+          sudo mount ${LOOP_DEVICE}p1 /mnt/boot
+
+          # Verify mounts
+          if ! mount | grep -q "${LOOP_DEVICE}p2 on /mnt type ext4"; then
+            echo "Failed to mount root partition"
+            exit 1
+          fi
+          if ! mount | grep -q "${LOOP_DEVICE}p1 on /mnt/boot type vfat"; then
+            echo "Failed to mount boot partition"
+            exit 1
+          fi
+
       - name: Clean up
         run: |
-          sudo umount /mnt/BOOT || true
+          sudo umount /mnt/boot || true
           sudo umount /mnt || true
-          sudo losetup -d ${{ env.LOOP_DEVICE }}
+          sudo losetup -d ${{ env.LOOP_DEVICE }} || true
         if: always()

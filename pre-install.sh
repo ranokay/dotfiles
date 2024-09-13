@@ -50,12 +50,23 @@ while [[ $# -gt 0 ]]; do
     AUTOCONFIRM=true
     shift
     ;;
+  --help)
+    echo "Usage: $0 [--disk <disk>] [--auto-confirm]"
+    echo "  --disk: Specify the disk to use for installation"
+    echo "  --auto-confirm: Skip confirmation prompts"
+    exit 0
+    ;;
   *)
     print_colored "$RED" "Unknown option: $1"
     exit 1
     ;;
   esac
 done
+
+if [ "$(id -u)" -ne 0 ]; then
+  print_colored "$RED" "This script must be run as root"
+  exit 1
+fi
 
 if [ "$(uname)" == "Darwin" ]; then
   print_colored "$YELLOW" "macOS detected"
@@ -72,11 +83,19 @@ if [ "$(uname)" == "Darwin" ]; then
   fi
 
   print_header "Installing Rosetta"
-  check_command softwareupdate --install-rosetta --agree-to-license
-  print_colored "$GREEN" "Rosetta installed successfully."
+  if [[ $(uname -m) == 'arm64' ]]; then
+    check_command softwareupdate --install-rosetta --agree-to-license
+    print_colored "$GREEN" "Rosetta installed successfully."
+  else
+    print_colored "$YELLOW" "Rosetta installation skipped (not on ARM64)."
+  fi
 
   print_header "Installing Nix"
-  check_command curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+  if command -v nix &>/dev/null; then
+    print_colored "$YELLOW" "Nix is already installed. Skipping installation."
+  else
+    check_command curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
+  fi
 
   print_colored "$GREEN" "All steps completed successfully. nix-darwin is now ready to be installed."
   echo -e "\nTo install nix-darwin configuration, run the following commands:"
@@ -94,6 +113,11 @@ elif [ "$(uname)" == "Linux" ]; then
 
     print_header "Verifying Disk"
     confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
+  fi
+
+  if [[ ! -e "$DISK" ]]; then
+    print_colored "$RED" "Error: Disk $DISK does not exist."
+    exit 1
   fi
 
   if [[ $DISK =~ "nvme" ]] || [[ $DISK =~ "loop" ]]; then
@@ -131,8 +155,8 @@ elif [ "$(uname)" == "Linux" ]; then
 
   print_header "Mounting Filesystems"
   check_command mount UUID=$NIX_UUID /mnt
-  check_command mkdir -pv /mnt/BOOT
-  check_command mount UUID=$BOOT_UUID /mnt/BOOT
+  check_command mkdir -pv /mnt/boot
+  check_command mount UUID=$BOOT_UUID /mnt/boot
   print_colored "$GREEN" "Filesystems mounted successfully."
 
   print_colored "$GREEN" "All steps completed successfully. NixOS is now ready to be installed."
