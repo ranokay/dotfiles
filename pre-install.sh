@@ -121,6 +121,10 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- mkpart Nix 512MiB 100%; then
     sync # Ensure changes are flushed to disk
     print_colored "$GREEN" "Disk partitioned successfully."
+
+    # Force re-reading of the partition table
+    print_header "Refreshing partition table"
+    partprobe $DISK
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
