@@ -107,7 +107,6 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- mkpart ESP fat32 1MiB 512MiB &&
     parted $DISK -- set 1 boot on &&
     parted $DISK -- mkpart Nix 512MiB 100%; then
-    sync # Ensure changes are flushed to disk
     print_colored "$GREEN" "Disk partitioned successfully."
   else
     print_colored "$RED" "Error partitioning disk."
@@ -115,13 +114,13 @@ elif [ "$(uname)" == "Linux" ]; then
   fi
 
   # Check disk labeling to verify partitions were created
-  if ! lsblk | grep -q "${DISK}p1"; then
-    print_colored "$RED" "Partition ${DISK}p1 not found."
-    exit 1
-  fi
+  # if ! lsblk | grep -q "${DISK}p1"; then
+  #   print_colored "$RED" "Partition ${DISK}p1 not found."
+  #   exit 1
+  # fi
 
   print_header "Creating Filesystems"
-  if mkfs.fat -F32 -n boot ${DISK}p1 && mkfs.ext4 -F -L nix ${DISK}p2; then
+  if mkfs.fat -F32 -n BOOT ${DISK}p1 && mkfs.ext4 -F -L NIX ${DISK}p2; then
     sync # Ensure filesystems are created properly
     print_colored "$GREEN" "Filesystems created successfully."
   else
