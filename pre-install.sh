@@ -118,8 +118,8 @@ elif [ "$(uname)" == "Linux" ]; then
   fi
 
   # Check disk labeling to verify partitions were created
-  if ! lsblk | grep -q $DISK; then
-    print_colored "$RED" "Partition $DISK not found."
+  if ! lsblk | grep -q ${DISK}p1; then
+    print_colored "$RED" "Partition ${DISK}p1 not found."
     exit 1
   fi
 
