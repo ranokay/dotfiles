@@ -129,4 +129,3 @@ with how it appears on the official website.
 
 1. [Secure boot](https://github.com/nix-community/lanzaboote)
 2. Binary caching
-3. [Wireless remote unlocking](https://discourse.nixos.org/t/wireless-connection-within-initrd/38317/13)

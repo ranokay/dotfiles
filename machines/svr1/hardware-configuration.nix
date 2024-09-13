@@ -8,21 +8,6 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot = {
-    initrd = {
-      availableKernelModules = ["nvme" "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_usb_sdmmc" "r8152"];
-      luks = {
-        reusePassphrases = true;
-        devices = {
-          "cryptroot" = {
-            device = "/dev/nvme0n1p2";
-            allowDiscards = true;
-          };
-        };
-      };
-    };
-  };
-
   fileSystems = {
     "/" = {
       device = "none";
