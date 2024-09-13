@@ -124,13 +124,13 @@ elif [ "$(uname)" == "Linux" ]; then
   fi
 
   # Check disk labeling to verify partitions were created
-  # if ! lsblk | grep -q "${PART1}"; then
-  #   print_colored "$RED" "Partition ${PART1} not found."
-  #   exit 1
-  # fi
+  if ! lsblk | grep -q "${DISK}p1"; then
+    print_colored "$RED" "Partition ${DISK}p1 not found."
+    exit 1
+  fi
 
   print_header "Creating Filesystems"
-  if mkfs.fat -F32 -n BOOT $PART1 && mkfs.ext4 -F -L NIX $PART2; then
+  if mkfs.fat -F32 -n BOOT ${DISK}p1 && mkfs.ext4 -F -L NIX ${DISK}p2; then
     sync # Ensure filesystems are created properly
     print_colored "$GREEN" "Filesystems created successfully."
   else
