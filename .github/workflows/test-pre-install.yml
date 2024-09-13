@@ -19,7 +19,7 @@ jobs:
       - name: Create test disk image
         run: |
           dd if=/dev/zero of=testdisk.img bs=1M count=1024
-          sudo losetup -f testdisk.img
+          sudo losetup -fP testdisk.img
           LOOP_DEVICE=$(sudo losetup -j testdisk.img | cut -d':' -f1)
           if [ -z "$LOOP_DEVICE" ]; then
             echo "Failed to create loop device"

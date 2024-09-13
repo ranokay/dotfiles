@@ -98,6 +98,15 @@ elif [ "$(uname)" == "Linux" ]; then
     read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
   fi
 
+  # Dynamic partition name based on disk type (nvme or regular)
+  if [[ $DISK =~ "nvme" ]]; then
+    PART1="${DISK}p1"
+    PART2="${DISK}p2"
+  else
+    PART1="${DISK}1"
+    PART2="${DISK}2"
+  fi
+
   print_header "Verifying Disk"
   confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
 
@@ -116,15 +125,6 @@ elif [ "$(uname)" == "Linux" ]; then
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
-  fi
-
-  # Dynamic partition name based on disk type (nvme or regular)
-  if [[ $DISK =~ "nvme" ]]; then
-    PART1="${DISK}p1"
-    PART2="${DISK}p2"
-  else
-    PART1="${DISK}1"
-    PART2="${DISK}2"
   fi
 
   # Check disk labeling to verify partitions were created
