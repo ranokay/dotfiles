@@ -96,10 +96,19 @@ elif [ "$(uname)" == "Linux" ]; then
     print_header "Available Disks"
     lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -w disk
     read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
+
+    print_header "Verifying Disk"
+    confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
   fi
 
-  print_header "Verifying Disk"
-  confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
+  # Dynamic partition name based on disk type (nvme or regular)
+  if [[ $DISK =~ "nvme" ]] || [[ $DISK =~ "loop" ]]; then
+    PART1="${DISK}p1"
+    PART2="${DISK}p2"
+  else
+    PART1="${DISK}1"
+    PART2="${DISK}2"
+  fi
 
   # Partitioning the disk
   print_header "Partitioning Disk"
@@ -108,13 +117,17 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- set 1 boot on &&
     parted $DISK -- mkpart Nix 512MiB 100%; then
     print_colored "$GREEN" "Disk partitioned successfully."
+    print_colored "$GREEN" "Disk labeled as $DISK"
+    print_colored "$GREEN" "Partitions created:"
+    print_colored "$GREEN" "ESP: $PART1"
+    print_colored "$GREEN" "NIX: $PART2"
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
   fi
 
   print_header "Creating Filesystems"
-  if mkfs.fat -F32 -n BOOT ${DISK}p1 && mkfs.ext4 -F -L NIX ${DISK}p2; then
+  if mkfs.fat -F32 -n BOOT $PART1 && mkfs.ext4 -F -L NIX $PART2; then
     sync
     print_colored "$GREEN" "Filesystems created successfully."
   else
@@ -124,8 +137,8 @@ elif [ "$(uname)" == "Linux" ]; then
 
   # Retrieving UUIDs for the partitions
   print_header "Retrieving UUIDs"
-  BOOT_UUID=$(blkid -s UUID -o value ${DISK}p1)
-  NIX_UUID=$(blkid -s UUID -o value ${DISK}p2)
+  BOOT_UUID=$(blkid -s UUID -o value $PART1)
+  NIX_UUID=$(blkid -s UUID -o value $PART2)
 
   if [ -z "$BOOT_UUID" ] || [ -z "$NIX_UUID" ]; then
     print_colored "$RED" "Error retrieving UUIDs."
