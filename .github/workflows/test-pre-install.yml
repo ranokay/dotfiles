@@ -27,12 +27,6 @@ jobs:
           fi
           echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
 
-      - name: Modify pre-install script for testing
-        run: |
-          sed -i 's/read -p "Enter the disk to partition (e.g., \/dev\/nvme0n1): " DISK/DISK=$LOOP_DEVICE/' pre-install.sh
-          sed -i 's/confirm "Are you sure you want to format $DISK? This will erase all data on the disk."/echo "Confirmed disk formatting for testing"/' pre-install.sh
-          sed -i 's/confirm "This script will prepare the system for NixOS installation. Do you want to continue?"/echo "Confirmed NixOS installation preparation for testing"/' pre-install.sh
-
       - name: Run pre-install script
         run: |
           sudo bash pre-install.sh --disk ${{ env.LOOP_DEVICE }} --auto-confirm
@@ -45,6 +39,6 @@ jobs:
 
       - name: Clean up
         run: |
-          sudo umount /mnt/boot || true
+          sudo umount /mnt/BOOT || true
           sudo umount /mnt || true
           sudo losetup -d ${{ env.LOOP_DEVICE }}

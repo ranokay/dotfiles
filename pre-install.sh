@@ -116,26 +116,15 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $DISK -- mkpart ESP fat32 1MiB 512MiB &&
     parted $DISK -- set 1 boot on &&
     parted $DISK -- mkpart Nix 512MiB 100%; then
-    sync # Ensure changes are flushed to disk
     print_colored "$GREEN" "Disk partitioned successfully."
-    print_colored "$GREEN" "Disk labeled as $DISK"
-    print_colored "$GREEN" "Partitions created:"
-    print_colored "$GREEN" "ESP: $PART1"
-    print_colored "$GREEN" "NIX: $PART2"
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
   fi
 
-  # Check disk labeling to verify partitions were created
-  if ! lsblk | grep -q "${PART1}"; then
-    print_colored "$RED" "Partition ${PART1} not found."
-    exit 1
-  fi
-
   print_header "Creating Filesystems"
   if mkfs.fat -F32 -n BOOT $PART1 && mkfs.ext4 -F -L NIX $PART2; then
-    sync # Ensure filesystems are created properly
+    sync
     print_colored "$GREEN" "Filesystems created successfully."
   else
     print_colored "$RED" "Error creating filesystems."
@@ -158,7 +147,7 @@ elif [ "$(uname)" == "Linux" ]; then
 
   # Mounting filesystems
   print_header "Mounting Filesystems"
-  if mkdir -pv /mnt/boot && mount UUID=$NIX_UUID /mnt && mount UUID=$BOOT_UUID /mnt/boot; then
+  if mount UUID=$NIX_UUID /mnt && mkdir -pv /mnt/BOOT && mount UUID=$BOOT_UUID /mnt/BOOT; then
     print_colored "$GREEN" "Filesystems mounted successfully."
   else
     print_colored "$RED" "Failed to mount filesystems. Root partition UUID: $NIX_UUID, Boot partition UUID: $BOOT_UUID"
