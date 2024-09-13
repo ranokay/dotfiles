@@ -127,6 +127,10 @@ elif [ "$(uname)" == "Linux" ]; then
     exit 1
   fi
 
+  print_header "Refreshing partition table"
+  partprobe $DISK
+  udevadm settle
+
   # Check disk labeling to verify partitions were created
   if ! lsblk | grep -q "${PART1}"; then
     print_colored "$RED" "Partition ${PART1} not found."
