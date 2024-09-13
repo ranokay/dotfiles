@@ -144,7 +144,7 @@ elif [ "$(uname)" == "Linux" ]; then
 
   # Mounting filesystems
   print_header "Mounting Filesystems"
-  if mkdir -pv /mnt/boot && mount UUID=$NIX_UUID /mnt && mount UUID=$BOOT_UUID /mnt/boot; then
+  if mkdir -pv /mnt/BOOT && mount UUID=$NIX_UUID /mnt && mount UUID=$BOOT_UUID /mnt/BOOT; then
     print_colored "$GREEN" "Filesystems mounted successfully."
   else
     print_colored "$RED" "Failed to mount filesystems. Root partition UUID: $NIX_UUID, Boot partition UUID: $BOOT_UUID"

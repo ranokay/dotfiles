@@ -45,6 +45,6 @@ jobs:
 
       - name: Clean up
         run: |
-          sudo umount /mnt/boot || true
+          sudo umount /mnt/BOOT || true
           sudo umount /mnt || true
           sudo losetup -d ${{ env.LOOP_DEVICE }}
