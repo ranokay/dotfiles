@@ -121,7 +121,7 @@ elif [ "$(uname)" == "Linux" ]; then
   fi
 
   print_header "Creating Filesystems"
-  if mkfs.fat -F32 -n BOOT ${DISK}p1 && mkfs.ext4 -F -L NIX ${DISK}p2; then
+  if mkfs.fat -F32 -n boot ${DISK}p1 && mkfs.ext4 -F -L nix ${DISK}p2; then
     sync # Ensure filesystems are created properly
     print_colored "$GREEN" "Filesystems created successfully."
   else
