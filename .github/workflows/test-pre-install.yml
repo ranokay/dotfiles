@@ -1,9 +1,6 @@
 name: "Test Pre-install Script"
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch: null
 
 jobs:
@@ -19,7 +16,7 @@ jobs:
       - name: Create test disk image
         run: |
           dd if=/dev/zero of=testdisk.img bs=1M count=1024
-          sudo losetup -f testdisk.img
+          sudo losetup -fP testdisk.img
           LOOP_DEVICE=$(sudo losetup -j testdisk.img | cut -d':' -f1)
           if [ -z "$LOOP_DEVICE" ]; then
             echo "Failed to create loop device"
@@ -42,3 +39,4 @@ jobs:
           sudo umount /mnt/BOOT || true
           sudo umount /mnt || true
           sudo losetup -d ${{ env.LOOP_DEVICE }}
+        if: always()
