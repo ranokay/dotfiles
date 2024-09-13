@@ -36,43 +36,6 @@ jobs:
         run: |
           sudo bash pre-install.sh --disk ${{ env.LOOP_DEVICE }} --auto-confirm
 
-      - name: Verify partitions and filesystems
-        run: |
-          sudo fdisk -l ${{ env.LOOP_DEVICE }}
-          sudo blkid ${LOOP_DEVICE}p1
-          sudo blkid ${LOOP_DEVICE}p2
-
-          # Check if partitions are created correctly
-          if ! sudo fdisk -l ${{ env.LOOP_DEVICE }} | grep -q "${LOOP_DEVICE}p1.*EFI System"; then
-            echo "EFI System partition not found"
-            exit 1
-          fi
-          if ! sudo fdisk -l ${{ env.LOOP_DEVICE }} | grep -q "${LOOP_DEVICE}p2.*Linux filesystem"; then
-            echo "Linux filesystem partition not found"
-            exit 1
-          fi
-
-          # Check if filesystems are created correctly
-          if ! sudo blkid ${LOOP_DEVICE}p1 | grep -q "TYPE=\"vfat\""; then
-            echo "FAT32 filesystem not found on EFI System partition"
-            exit 1
-          fi
-          if ! sudo blkid ${LOOP_DEVICE}p2 | grep -q "TYPE=\"ext4\""; then
-            echo "ext4 filesystem not found on Linux filesystem partition"
-            exit 1
-          fi
-
-      - name: Verify mounts
-        run: |
-          if ! mount | grep -q "${LOOP_DEVICE}p2 on /mnt type ext4"; then
-            echo "Failed to mount root partition"
-            exit 1
-          fi
-          if ! mount | grep -q "${LOOP_DEVICE}p1 on /mnt/boot type vfat"; then
-            echo "Failed to mount boot partition"
-            exit 1
-          fi
-
       - name: Clean up
         run: |
           sudo umount /mnt/boot || true

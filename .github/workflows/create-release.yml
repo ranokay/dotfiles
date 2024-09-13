@@ -1,11 +1,10 @@
----
 name: "Release Custom NixOS ISO"
 
 on:
   push:
     tags:
       - v*
-  workflow_dispatch: null
+  workflow_dispatch:
 
 jobs:
   build:
