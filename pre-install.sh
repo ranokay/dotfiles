@@ -98,13 +98,10 @@ elif [ "$(uname)" == "Linux" ]; then
     read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
   fi
 
-  # Dynamic partition name based on disk type (nvme, loop, etc.)
+  # Dynamic partition name based on disk type (nvme or regular)
   if [[ $DISK =~ "nvme" ]]; then
     PART1="${DISK}p1"
     PART2="${DISK}p2"
-  elif [[ $DISK =~ "loop" ]]; then
-    PART1="${DISK}"
-    PART2="${DISK}"
   else
     PART1="${DISK}1"
     PART2="${DISK}2"
