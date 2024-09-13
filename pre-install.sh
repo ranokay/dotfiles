@@ -91,20 +91,6 @@ elif [ "$(uname)" == "Linux" ]; then
   print_colored "$YELLOW" "Linux detected"
   confirm "This script will prepare the system for NixOS installation. Do you want to continue?"
 
-  # Check for necessary tools (parted, mkfs.fat, mkfs.ext4)
-  command -v parted >/dev/null 2>&1 || {
-    echo "parted is not installed. Aborting."
-    exit 1
-  }
-  command -v mkfs.fat >/dev/null 2>&1 || {
-    echo "mkfs.fat is not installed. Aborting."
-    exit 1
-  }
-  command -v mkfs.ext4 >/dev/null 2>&1 || {
-    echo "mkfs.ext4 is not installed. Aborting."
-    exit 1
-  }
-
   # Prompt user to enter disk if not provided as a command-line argument
   if [ -z "$DISK" ]; then
     print_header "Available Disks"
@@ -112,8 +98,11 @@ elif [ "$(uname)" == "Linux" ]; then
     read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
   fi
 
-  # Dynamic partition name based on disk type (nvme and loop vs non-nvme)
-  if [[ $DISK =~ "nvme" ]] || [[ $DISK =~ "loop" ]]; then
+  # Dynamic partition name based on disk type (nvme, loop, etc.)
+  if [[ $DISK =~ "nvme" ]]; then
+    PART1="${DISK}p1"
+    PART2="${DISK}p2"
+  elif [[ $DISK =~ "loop" ]]; then
     PART1="${DISK}p1"
     PART2="${DISK}p2"
   else
