@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
+# Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and consider failures in pipes.
 set -e -u -o pipefail
 
-# ANSI color codes
+# ANSI color codes for colored output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -16,13 +17,13 @@ print_colored() {
   echo -e "${color}${message}${NC}"
 }
 
-# Function to print section headers
+# Function to print section headers in blue
 print_header() {
   local message=$1
   echo -e "\n${BLUE}==== $message ====${NC}"
 }
 
-# Function to prompt for confirmation
+# Function to prompt the user for confirmation, bypassed if --auto-confirm is set
 confirm() {
   if $AUTOCONFIRM; then
     return 0
@@ -34,7 +35,7 @@ confirm() {
   fi
 }
 
-# Parse command-line arguments
+# Parse command-line arguments for disk and auto-confirmation
 DISK=""
 AUTOCONFIRM=false
 
@@ -55,11 +56,13 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# macOS setup for nix-darwin
 if [ "$(uname)" == "Darwin" ]; then
   print_colored "$YELLOW" "macOS detected"
   confirm "This script will prepare the system for nix-darwin installation. Do you want to continue?"
 
-  print_header "Installing Xcode"
+  print_header "Checking for required tools (Xcode and Rosetta)"
+  # Check if Xcode is installed
   if [[ -e /Library/Developer/CommandLineTools/usr/bin/git ]]; then
     print_colored "$GREEN" "Xcode already installed."
   else
@@ -69,10 +72,12 @@ if [ "$(uname)" == "Darwin" ]; then
     print_colored "$GREEN" "Xcode installed successfully."
   fi
 
+  # Install Rosetta
   print_header "Installing Rosetta"
   softwareupdate --install-rosetta --agree-to-license
   print_colored "$GREEN" "Rosetta installed successfully."
 
+  # Install Nix package manager
   print_header "Installing Nix"
   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --no-confirm
 
@@ -81,38 +86,50 @@ if [ "$(uname)" == "Darwin" ]; then
   print_colored "$YELLOW" ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
   print_colored "$YELLOW" "nix run nix-darwin -- switch --flake github:ranokay/dotfiles#mac1"
 
+# Linux setup for NixOS
 elif [ "$(uname)" == "Linux" ]; then
   print_colored "$YELLOW" "Linux detected"
   confirm "This script will prepare the system for NixOS installation. Do you want to continue?"
 
+  # Prompt user to enter disk if not provided as a command-line argument
   if [ -z "$DISK" ]; then
     print_header "Available Disks"
-    lsblk
+    lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -w disk
     read -p "Enter the disk to partition (e.g., /dev/nvme0n1): " DISK
   fi
 
   print_header "Verifying Disk"
   confirm "Are you sure you want to format $DISK? This will erase all data on the disk."
 
+  # Partitioning the disk
   print_header "Partitioning Disk"
   if parted $DISK -- mklabel gpt &&
     parted $DISK -- mkpart ESP fat32 1MiB 512MiB &&
     parted $DISK -- set 1 boot on &&
     parted $DISK -- mkpart Nix 512MiB 100%; then
+    sync # Ensure changes are flushed to disk
     print_colored "$GREEN" "Disk partitioned successfully."
   else
     print_colored "$RED" "Error partitioning disk."
     exit 1
   fi
 
+  # Check disk labeling to verify partitions were created
+  if ! lsblk | grep -q "${DISK}p1"; then
+    print_colored "$RED" "Partition ${DISK}p1 not found."
+    exit 1
+  fi
+
   print_header "Creating Filesystems"
-  if mkfs.fat -F32 -n boot ${DISK}p1 && mkfs.ext4 -F -L nix ${DISK}p2; then
+  if mkfs.fat -F32 -n BOOT ${DISK}p1 && mkfs.ext4 -F -L NIX ${DISK}p2; then
+    sync # Ensure filesystems are created properly
     print_colored "$GREEN" "Filesystems created successfully."
   else
     print_colored "$RED" "Error creating filesystems."
     exit 1
   fi
 
+  # Retrieving UUIDs for the partitions
   print_header "Retrieving UUIDs"
   BOOT_UUID=$(blkid -s UUID -o value ${DISK}p1)
   NIX_UUID=$(blkid -s UUID -o value ${DISK}p2)
@@ -122,18 +139,25 @@ elif [ "$(uname)" == "Linux" ]; then
     exit 1
   fi
 
+  # Using tmpfs for the /mnt directory
+  print_header "Using tmpfs for /mnt"
+  mount -t tmpfs none /mnt
+
+  # Mounting filesystems
   print_header "Mounting Filesystems"
-  if mount UUID=$NIX_UUID /mnt && mkdir -pv /mnt/boot && mount UUID=$BOOT_UUID /mnt/boot; then
+  if mkdir -pv /mnt/boot && mount UUID=$NIX_UUID /mnt && mount UUID=$BOOT_UUID /mnt/boot; then
     print_colored "$GREEN" "Filesystems mounted successfully."
   else
-    print_colored "$RED" "Error mounting filesystems."
+    print_colored "$RED" "Failed to mount filesystems. Root partition UUID: $NIX_UUID, Boot partition UUID: $BOOT_UUID"
     exit 1
   fi
 
   print_colored "$GREEN" "All steps completed successfully. NixOS is now ready to be installed."
   echo -e "\nTo install NixOS configuration for your hostname, run the following command:"
   print_colored "$YELLOW" "sudo nixos-install --no-root-passwd --flake github:ranokay/dotfiles#hostname"
+
 else
+  # Unsupported OS error
   print_colored "$RED" "Unsupported operating system."
   exit 1
 fi
