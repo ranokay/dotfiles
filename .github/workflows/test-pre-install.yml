@@ -62,14 +62,8 @@ jobs:
             exit 1
           fi
 
-      - name: Test mounting
+      - name: Verify mounts
         run: |
-          sudo mkdir -p /mnt
-          sudo mount ${LOOP_DEVICE}p2 /mnt
-          sudo mkdir -p /mnt/boot
-          sudo mount ${LOOP_DEVICE}p1 /mnt/boot
-
-          # Verify mounts
           if ! mount | grep -q "${LOOP_DEVICE}p2 on /mnt type ext4"; then
             echo "Failed to mount root partition"
             exit 1
