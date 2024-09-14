@@ -47,6 +47,8 @@
     nix-darwin,
     ...
   } @ inputs: let
+    inherit (self) outputs;
+
     systems = [
       "x86_64-linux"
       "aarch64-linux"
@@ -60,7 +62,7 @@
 
     darwinConfigurations = {
       mac1 = nix-darwin.lib.darwinSystem {
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs outputs;};
         modules = [./machines/mac1/configuration.nix];
       };
     };
@@ -68,7 +70,7 @@
     nixosConfigurations = {
       iso1-x86_64 = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs outputs;};
         modules = [
           "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
           ./machines/iso1/configuration.nix
@@ -77,7 +79,7 @@
 
       iso1-arm = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs outputs;};
         modules = [
           "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
           ./machines/iso1/configuration.nix
@@ -85,8 +87,7 @@
       };
 
       svr1 = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = {inherit inputs;};
+        specialArgs = {inherit inputs outputs;};
         modules = [./machines/svr1/configuration.nix];
       };
     };
