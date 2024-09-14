@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [x86_64-linux, aarch64-linux]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,10 +23,10 @@ jobs:
       - name: Build ISO
         run: |
           nix_bin=$(which nix)
-          sudo $nix_bin build .#nixosConfigurations.iso1.config.system.build.isoImage
+          sudo $nix_bin build .#nixosConfigurations.iso1-${{ matrix.architecture }}.config.system.build.isoImage
 
       - name: Rename ISO
-        run: sudo mv result/iso/nixos-*.iso nixos.iso
+        run: sudo mv result/iso/nixos-*.iso nixos-${{ matrix.architecture }}.iso
 
       - name: Create Tag (if manual run)
         if: github.event_name == 'workflow_dispatch'
@@ -36,11 +39,11 @@ jobs:
       - name: Upload ISO
         uses: actions/upload-artifact@v4
         with:
-          name: nixos.iso
-          path: nixos.iso
+          name: nixos-${{ matrix.architecture }}.iso
+          path: nixos-${{ matrix.architecture }}.iso
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          files: nixos.iso
+          files: nixos-${{ matrix.architecture }}.iso
