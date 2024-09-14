@@ -25,19 +25,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    homebrew = {
-      bundle = {
-        url = "github:homebrew/homebrew-bundle";
-        flake = false;
-      };
-      core = {
-        url = "github:homebrew/homebrew-core";
-        flake = false;
-      };
-      cask = {
-        url = "github:homebrew/homebrew-cask";
-        flake = false;
-      };
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
     };
   };
 
