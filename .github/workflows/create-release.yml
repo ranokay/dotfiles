@@ -7,6 +7,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  create-tag:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Tag (if manual run)
+        run: |
+          tag="v$(date +'%Y.%m.%d.%H.%M')"
+          echo "TAG=$tag" >> $GITHUB_ENV
+          git tag $tag
+          git push origin main
+
   build:
     strategy:
       matrix:
@@ -30,47 +46,21 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq qemu binfmt-support qemu-user-static
 
-      - name: Build ISO
+      - name: Build
         run: |
           nix build .#nixosConfigurations.iso1-${{ matrix.architecture }}.config.system.build.isoImage
 
-      - name: Rename ISO
+      - name: Rename
         run: |
           sudo mv result/iso/nixos-*.iso nixos-${{ matrix.architecture }}.iso
 
-      - name: Upload ISO
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: nixos-${{ matrix.architecture }}.iso
           path: nixos-${{ matrix.architecture }}.iso
 
-  release:
-    strategy:
-      matrix:
-        architecture: [x86_64-linux, aarch64-linux]
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: nixos-${{ matrix.architecture }}.iso
-          path: .
-
-      - name: Create Tag (if manual run)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          tag="v$(date +'%Y.%m.%d.%H.%M')"
-          echo "TAG=$tag" >> $GITHUB_ENV
-          git tag $tag
-          git push origin $tag
-
-      - name: Release ISOs
+      - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
