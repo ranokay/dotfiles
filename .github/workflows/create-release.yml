@@ -34,7 +34,7 @@ jobs:
         uses: uraimo/run-on-arch-action@v2
         with:
           arch: aarch64
-          distro: ubuntu_latest
+          distro: bullseye
           run: |
             nix_bin=$(which nix)
             $nix_bin build .#nixosConfigurations.iso1-arm.config.system.build.isoImage
