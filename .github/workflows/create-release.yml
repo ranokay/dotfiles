@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        architecture: [x86_64-linux, aarch64-linux]
+        architecture: [x86_64-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -64,14 +64,13 @@ jobs:
       - name: Download ISOs
         uses: actions/download-artifact@v4
         with:
-          path: ./iso/nixos-${{ matrix.architecture }}.iso
+          path: .
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           files: |
-            ./iso/nixos-x86_64-linux.iso
-            ./iso/nixos-aarch64-linux.iso
+            nixos-${{ matrix.architecture }}.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
