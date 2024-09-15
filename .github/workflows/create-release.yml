@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nixos-${{ matrix.architecture }}.iso
-          path: nixos-${{ matrix.architecture }}.iso
+          path: ./result
 
   release:
     needs: build
@@ -64,13 +64,13 @@ jobs:
       - name: Download ISOs
         uses: actions/download-artifact@v4
         with:
-          path: .
+          path: ./result
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           files: |
-            nixos-${{ matrix.architecture }}.iso
+            ./result/nixos-${{ matrix.architecture }}.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
