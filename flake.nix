@@ -68,7 +68,7 @@
     };
 
     nixosConfigurations = {
-      iso1-x86_64 = nixpkgs.lib.nixosSystem {
+      iso1-x86_64-linux = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs outputs;};
         modules = [
@@ -77,7 +77,7 @@
         ];
       };
 
-      iso1-arm = nixpkgs.lib.nixosSystem {
+      iso1-aarch64-linux = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         specialArgs = {inherit inputs outputs;};
         modules = [
