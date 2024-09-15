@@ -24,13 +24,6 @@ jobs:
 
       - uses: cachix/install-nix-action@v27
 
-      - name: Set up QEMU for ARM builds
-        if: matrix.architecture == 'aarch64-linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu binfmt-support qemu-user-static
-          sudo update-binfmts --enable qemu-aarch64
-
       - name: Build ISO
         run: |
           nix_bin=$(which nix)
