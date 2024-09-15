@@ -45,7 +45,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/ranokay/dotfiles/main/in
 > NixOS on your own hardware will fail. At minimum, you'll need to do the
 > following before attemping installation:
 >
-> 1. Create a configuration for your own device in the `machines/` folder
+> 1. Create a configuration for your own device in the `hosts/` folder
 > 1. Retool your own sops-nix secrets or remove them entirely if you don't use
 >    sops-nix
 > 1. Add an entry to flake.nix referencing the configuration created in step 1

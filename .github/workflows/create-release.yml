@@ -64,7 +64,7 @@ jobs:
       - name: Download ISOs
         uses: actions/download-artifact@v4
         with:
-          path: ./iso
+          path: ./iso/nixos-${{ matrix.architecture }}.iso
 
       - name: Release
         uses: softprops/action-gh-release@v2

@@ -63,7 +63,7 @@
     darwinConfigurations = {
       mac1 = nix-darwin.lib.darwinSystem {
         specialArgs = {inherit inputs outputs;};
-        modules = [./machines/mac1/configuration.nix];
+        modules = [./hosts/mac1/configuration.nix];
       };
     };
 
@@ -73,7 +73,7 @@
         specialArgs = {inherit inputs outputs;};
         modules = [
           "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          ./machines/iso1/configuration.nix
+          ./hosts/iso1/configuration.nix
         ];
       };
 
@@ -82,13 +82,13 @@
         specialArgs = {inherit inputs outputs;};
         modules = [
           "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          ./machines/iso1/configuration.nix
+          ./hosts/iso1/configuration.nix
         ];
       };
 
       svr1 = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};
-        modules = [./machines/svr1/configuration.nix];
+        modules = [./hosts/svr1/configuration.nix];
       };
     };
   };

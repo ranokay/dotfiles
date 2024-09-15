@@ -3,6 +3,8 @@
     ./_packages.nix
   ];
 
+  isoImage.squashfsCompression = "gzip -Xcompression-level 1";
+
   users.users.nixos = {
     isNormalUser = true;
     extraGroups = ["wheel"];
