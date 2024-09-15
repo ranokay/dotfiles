@@ -7,22 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-tag:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Create Tag (if manual run)
-        run: |
-          tag="v$(date +'%Y.%m.%d.%H.%M')"
-          echo "TAG=$tag" >> $GITHUB_ENV
-          git tag $tag
-          git push origin main
-
   build:
     strategy:
       matrix:
@@ -60,9 +44,39 @@ jobs:
           name: nixos-${{ matrix.architecture }}.iso
           path: nixos-${{ matrix.architecture }}.iso
 
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download x86_64 Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nixos-x86_64-linux.iso
+          path: .
+
+      - name: Download ARM Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nixos-aarch64-linux.iso
+          path: .
+
+      - name: Create Tag (if manual run)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          tag="v$(date +'%Y.%m.%d.%H.%M')"
+          echo "TAG=$tag" >> $GITHUB_ENV
+          git tag $tag
+          git push origin $tag
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           files: |
-            nixos-${{ matrix.architecture }}.iso
+            nixos-x86_64-linux.iso
+            nixos-aarch64-linux.iso
