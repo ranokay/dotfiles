@@ -11,7 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        architecture: [x86_64-linux, aarch64-linux]
+        include:
+          - config_name: iso1-x86_64
+            architecture: x86_64-linux
+          - config_name: iso1-arm
+            architecture: aarch64-linux
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,10 +24,17 @@ jobs:
 
       - uses: cachix/install-nix-action@v27
 
+      - name: Set up QEMU for ARM builds
+        if: matrix.architecture == 'aarch64-linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu binfmt-support qemu-user-static
+          sudo update-binfmts --enable qemu-aarch64
+
       - name: Build ISO
         run: |
           nix_bin=$(which nix)
-          sudo $nix_bin build .#nixosConfigurations.iso1-${{ matrix.architecture }}.config.system.build.isoImage
+          sudo $nix_bin build .#nixosConfigurations.${{ matrix.config_name }}.config.system.build.isoImage
 
       - name: Rename ISO
         run: sudo mv result/iso/nixos-*.iso nixos-${{ matrix.architecture }}.iso
