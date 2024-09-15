@@ -31,10 +31,11 @@ jobs:
 
       - name: Build ISO (ARM)
         if: matrix.architecture == 'aarch64-linux'
-        uses: pguyot/arm-runner-action@v2
+        uses: uraimo/run-on-arch-action@v2
         with:
-          base_image: raspios_lite_arm64:latest
-          commands: |
+          arch: aarch64
+          distro: ubuntu22.04
+          run: |
             nix_bin=$(which nix)
             $nix_bin build .#nixosConfigurations.iso1-arm.config.system.build.isoImage
 
