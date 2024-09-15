@@ -71,6 +71,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           files: |
-            ./result/nixos-${{ matrix.architecture }}.iso
+            ./result/nixos-x86_64-linux.iso
+            ./result/nixos-aarch64-linux.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
