@@ -38,6 +38,30 @@ jobs:
         run: |
           sudo mv result/iso/nixos-*.iso nixos-${{ matrix.architecture }}.iso
 
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: nixos-${{ matrix.architecture }}.iso
+          path: nixos-${{ matrix.architecture }}.iso
+
+  release:
+    strategy:
+      matrix:
+        architecture: [x86_64-linux, aarch64-linux]
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: nixos-${{ matrix.architecture }}.iso
+          path: .
+
       - name: Create Tag (if manual run)
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -46,15 +70,9 @@ jobs:
           git tag $tag
           git push origin $tag
 
-      - name: Upload ISO
-        uses: actions/upload-artifact@v4
-        with:
-          name: nixos-${{ matrix.architecture }}.iso
-          path: nixos-${{ matrix.architecture }}.iso
-
-      - name: Release
+      - name: Release ISOs
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.TAG }}
+          tag_name: ${{ github.ref_name }}
           files: |
             nixos-${{ matrix.architecture }}.iso
