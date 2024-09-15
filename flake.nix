@@ -68,8 +68,8 @@
     };
 
     nixosConfigurations = {
-      iso1-x86_64 = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
+      iso1 = nixpkgs.lib.nixosSystem {
+        # system = "x86_64-linux";
         specialArgs = {inherit inputs outputs;};
         modules = [
           "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
@@ -77,14 +77,14 @@
         ];
       };
 
-      iso1-arm = nixpkgs.lib.nixosSystem {
-        system = "aarch64-linux";
-        specialArgs = {inherit inputs outputs;};
-        modules = [
-          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          ./machines/iso1/configuration.nix
-        ];
-      };
+      # iso1-arm = nixpkgs.lib.nixosSystem {
+      #   system = "aarch64-linux";
+      #   specialArgs = {inherit inputs outputs;};
+      #   modules = [
+      #     "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+      #     ./machines/iso1/configuration.nix
+      #   ];
+      # };
 
       svr1 = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};

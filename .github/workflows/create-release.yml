@@ -11,11 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - config_name: iso1-x86_64
-            architecture: x86_64-linux
-          - config_name: iso1-arm
-            architecture: aarch64-linux
+        architecture:
+          - x86_64-linux
+          - aarch64-linux
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,13 +23,28 @@ jobs:
 
       - uses: cachix/install-nix-action@v27
 
-      - name: Build ISO
+      - name: Build ISO (x86_64)
+        if: matrix.architecture == 'x86_64-linux'
         run: |
           nix_bin=$(which nix)
-          sudo $nix_bin build .#nixosConfigurations.${{ matrix.config_name }}.config.system.build.isoImage
+          sudo $nix_bin build .#nixosConfigurations.iso1.config.system.build.isoImage
+
+      - name: Build ISO (ARM)
+        if: matrix.architecture == 'aarch64-linux'
+        uses: pguyot/arm-runner-action@v2
+        with:
+          # base_image: raspios_lite:2022-04-04
+          commands: |
+            nix_bin=$(which nix)
+            $nix_bin build .#nixosConfigurations.iso1.config.system.build.isoImage
 
       - name: Rename ISO
-        run: sudo mv result/iso/nixos-*.iso nixos-${{ matrix.architecture }}.iso
+        run: |
+          if [ "${{ matrix.architecture }}" == "x86_64-linux" ]; then
+            sudo mv result/iso/nixos-*.iso nixos-x86_64.iso
+          else
+            sudo mv result/iso/nixos-*.iso nixos-arm.iso
+          fi
 
       - name: Create Tag (if manual run)
         if: github.event_name == 'workflow_dispatch'
