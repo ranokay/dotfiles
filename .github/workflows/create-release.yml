@@ -27,7 +27,7 @@ jobs:
         if: matrix.architecture == 'x86_64-linux'
         run: |
           nix_bin=$(which nix)
-          sudo $nix_bin build .#nixosConfigurations.iso1.config.system.build.isoImage
+          sudo $nix_bin build .#nixosConfigurations.iso1-x86_64.config.system.build.isoImage
 
       - name: Build ISO (ARM)
         if: matrix.architecture == 'aarch64-linux'
@@ -36,7 +36,7 @@ jobs:
           # base_image: raspios_lite:2022-04-04
           commands: |
             nix_bin=$(which nix)
-            $nix_bin build .#nixosConfigurations.iso1.config.system.build.isoImage
+            $nix_bin build .#nixosConfigurations.iso1-arm.config.system.build.isoImage
 
       - name: Rename ISO
         run: |
