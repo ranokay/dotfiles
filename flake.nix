@@ -1,5 +1,5 @@
 {
-  description = "Example Darwin system flake";
+  description = "Darwin system flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -44,21 +44,111 @@
       ...
     }: {
       nixpkgs.config.allowUnfree = true;
-      environment.systemPackages = with pkgs; [
-        alejandra # The Uncompromising Nix Code Formatter
-        statix # Lints and suggestions for the nix programming language
-        neovim
-      ];
+      environment = {
+        systemPackages = with pkgs; [
+          # Development
+          alejandra # The Uncompromising Nix Code Formatter
+          statix # Lints and suggestions for the nix programming language
+          nil # Language server for Nix
+          neovim
+
+          # Media
+          spotify
+
+          # Network
+          tailscale
+
+          # File Transfer
+          nicotine-plus
+
+          # Security
+          # _1password-gui # Marked as a broken package v.8.10.48
+          # _1password-cli
+        ];
+
+        variables = {
+          HOMEBREW_VERBOSE = "1";
+          HOMEBREW_NO_EMOJI = "1";
+          HOMEBREW_DEVELOPER = "1";
+        };
+      };
 
       homebrew = {
         enable = true;
         taps = builtins.attrNames config.nix-homebrew.taps;
-        brews = [
-          "mas"
-        ];
+        # brews = [
+        #   "mas"
+        # ];
         casks = [
+          # Development
+          "visual-studio-code"
+          "jetbrains-toolbox"
+          "cursor"
+          "zed"
+          "orbstack"
+          "expo-orbit"
+
+          # Network
+          "lulu"
+
+          # Design
+          "figma"
+          "figma-agent"
+
+          # Database
+          "dataflare"
+
+          # Virtualization
+          "vmware-fusion"
+          "whisky"
+          "crossover"
+
+          # Terminal
+          "warp"
+
+          # Media
+          "vlc"
+
+          # Communication
+          "legcord" # Discord client
+          "notion"
+          "telegram"
+          "microsoft-teams"
+
+          # Cloud
+          "nextcloud"
+
+          # Remote Desktop
+          "rustdesk"
+          "anydesk"
+
+          # File Transfer
+          "free-download-manager"
+
+          # Gaming
+          "nvidia-geforce-now"
+
+          # Security
+          "1password"
+          "1password-cli"
+          "yubico-authenticator"
+
+          # Browsers
+          "arc"
+          "brave-browser"
+
+          # Utilities
           "the-unarchiver"
-          "sentinel-app"
+          "sentinel-app" # A GUI for controlling Gatekeeper, unquarantining apps and more.
+          "aldente"
+          "betterdisplay"
+          "raycast"
+          "bartender"
+          "shottr"
+          "cleanmymac"
+          "rectangle-pro"
+          "balenaetcher"
+          "logi-options+"
         ];
         masApps = {
           "Clamshell" = 6477896729;
@@ -67,7 +157,12 @@
         onActivation = {
           autoUpdate = true;
           upgrade = true;
-          cleanup = "zap";
+          cleanup = "uninstall";
+          extraFlags = [
+            "--force" # Add force flag to handle existing installations
+            "--verbose"
+            "--debug"
+          ];
         };
       };
 
