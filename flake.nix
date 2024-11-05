@@ -26,10 +26,9 @@
     };
   };
 
-  outputs = inputs @ {
+  outputs = {
     self,
     darwin,
-    nixpkgs,
     homebrew,
     homebrew-core,
     homebrew-cask,
@@ -39,7 +38,6 @@
   }: let
     configuration = {
       pkgs,
-      lib,
       config,
       ...
     }: {
@@ -50,6 +48,7 @@
           alejandra # The Uncompromising Nix Code Formatter
           statix # Lints and suggestions for the nix programming language
           nil # Language server for Nix
+          nixd # Language server for Nix
           neovim
 
           # Media
@@ -76,9 +75,6 @@
       homebrew = {
         enable = true;
         taps = builtins.attrNames config.nix-homebrew.taps;
-        # brews = [
-        #   "mas"
-        # ];
         casks = [
           # Development
           "visual-studio-code"
@@ -110,7 +106,7 @@
           "vlc"
 
           # Communication
-          "legcord" # Discord client
+          # "legcord" # Discord client
           "notion"
           "telegram"
           "microsoft-teams"
@@ -127,6 +123,8 @@
 
           # Gaming
           "nvidia-geforce-now"
+          "steam"
+          "epic-games"
 
           # Security
           "1password"
@@ -177,24 +175,27 @@
       programs.zsh.enable = true; # default shell on catalina
       # programs.fish.enable = true;
 
-      system.defaults = {
-        dock = {
-          autohide = true;
-          persistent-apps = [];
+      system = {
+        defaults = {
+          dock = {
+            autohide = true;
+            autohide-delay = 0.0; # Make the dock appear instantly
+            autohide-time-modifier = 0.4; # Smoother animation
+            persistent-apps = null;
+          };
+          finder.FXPreferredViewStyle = "clmv";
+          loginwindow.GuestEnabled = false;
+          NSGlobalDomain.AppleICUForce24HourTime = true;
+          NSGlobalDomain.AppleInterfaceStyle = "Dark";
+          NSGlobalDomain.KeyRepeat = 2;
         };
-        finder.FXPreferredViewStyle = "clmv";
-        loginwindow.GuestEnabled = false;
-        NSGlobalDomain.AppleICUForce24HourTime = true;
-        NSGlobalDomain.AppleInterfaceStyle = "Dark";
-        NSGlobalDomain.KeyRepeat = 2;
+        # Set Git commit hash for darwin-version.
+        configurationRevision = self.rev or self.dirtyRev or null;
+
+        # Used for backwards compatibility, please read the changelog before changing.
+        # $ darwin-rebuild changelog
+        stateVersion = 5;
       };
-
-      # Set Git commit hash for darwin-version.
-      system.configurationRevision = self.rev or self.dirtyRev or null;
-
-      # Used for backwards compatibility, please read the changelog before changing.
-      # $ darwin-rebuild changelog
-      system.stateVersion = 5;
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
