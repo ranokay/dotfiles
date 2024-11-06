@@ -4,8 +4,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    darwin.url = "github:LnL7/nix-darwin";
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
+    darwin = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:LnL7/nix-darwin";
+    };
     homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     homebrew-core = {
@@ -41,7 +43,10 @@
       config,
       ...
     }: {
-      nixpkgs.config.allowUnfree = true;
+      nixpkgs = {
+        config.allowUnfree = true;
+        hostPlatform = "aarch64-darwin";
+      };
       environment = {
         systemPackages = with pkgs; [
           # Development
@@ -49,6 +54,7 @@
           statix # Lints and suggestions for the nix programming language
           nil # Language server for Nix
           nixd # Language server for Nix
+          just
           neovim
 
           # Media
@@ -181,13 +187,44 @@
             autohide = true;
             autohide-delay = 0.0; # Make the dock appear instantly
             autohide-time-modifier = 0.4; # Smoother animation
-            persistent-apps = null;
+            persistent-apps = [];
+            persistent-others = [];
+            magnification = true;
+            largesize = 52;
+            tilesize = 32;
+            showhidden = true;
+            show-recents = false;
+            static-only = true;
+            wvous-bl-corner = 4; # Bottom left corner - Desktop
+            wvous-br-corner = 3; # Bottom right corner - Mission Control
+            wvous-tl-corner = 11; # Top left corner - Launchpad
+            wvous-tr-corner = 2; # Top right corner - Application Windows
           };
-          finder.FXPreferredViewStyle = "clmv";
-          loginwindow.GuestEnabled = false;
-          NSGlobalDomain.AppleICUForce24HourTime = true;
-          NSGlobalDomain.AppleInterfaceStyle = "Dark";
-          NSGlobalDomain.KeyRepeat = 2;
+          finder = {
+            FXPreferredViewStyle = "Nlsv"; # List view
+            _FXShowPosixPathInTitle = false; # Show the full POSIX filepath in the window title
+            _FXSortFoldersFirst = true; # Keep folders on top when sorting by name
+            FXDefaultSearchScope = "SCcf"; # Change the default search scope to current folder
+            ShowPathbar = true; # Show path breadcrumbs
+            ShowStatusBar = true; # Show status bar at bottom
+            AppleShowAllFiles = true;
+            AppleShowAllExtensions = true;
+          };
+          loginwindow = {
+            LoginwindowText = "contact@ranokay.com"; # Text to be shown on the login window
+            GuestEnabled = false; # Allow users to login to the machine as guests
+          };
+          NSGlobalDomain = {
+            AppleICUForce24HourTime = true;
+            AppleInterfaceStyle = "Dark";
+            KeyRepeat = 2;
+            "com.apple.mouse.tapBehavior" = 1; # Enables tap to click
+          };
+        };
+
+        keyboard = {
+          enableKeyMapping = true;
+          remapCapsLockToEscape = true;
         };
         # Set Git commit hash for darwin-version.
         configurationRevision = self.rev or self.dirtyRev or null;
@@ -196,9 +233,6 @@
         # $ darwin-rebuild changelog
         stateVersion = 5;
       };
-
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
     };
   in {
     # Build darwin flake using:
