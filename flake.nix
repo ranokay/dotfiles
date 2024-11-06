@@ -56,6 +56,7 @@
           nixd # Language server for Nix
           just
           neovim
+          gh
 
           # Media
           spotify
