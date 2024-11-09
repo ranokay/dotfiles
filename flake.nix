@@ -57,19 +57,6 @@
           just
           neovim
           gh
-
-          # Media
-          spotify
-
-          # Network
-          tailscale
-
-          # File Transfer
-          nicotine-plus
-
-          # Security
-          # _1password-gui # Marked as a broken package v.8.10.48
-          # _1password-cli
         ];
 
         variables = {
@@ -93,6 +80,7 @@
 
           # Network
           "lulu"
+          "tailscale"
 
           # Design
           "figma"
@@ -111,6 +99,7 @@
 
           # Media
           "vlc"
+          "spotify"
 
           # Communication
           # "legcord" # Discord client
@@ -183,6 +172,14 @@
       # programs.fish.enable = true;
 
       system = {
+        # activationScripts.launchpadLayout.text = ''
+        #   # Set the Launchpad columns and rows
+        #   defaults write com.apple.dock springboard-columns -int 10
+        #   defaults write com.apple.dock springboard-rows -int 6
+
+        #   # Restart the Dock to apply changes
+        #   killall Dock
+        # '';
         defaults = {
           dock = {
             autohide = true;
@@ -194,8 +191,8 @@
             largesize = 52;
             tilesize = 32;
             showhidden = true;
-            show-recents = false;
-            static-only = true;
+            show-recents = false; # Disable recent applications
+            static-only = true; # Only show applications that are open
             wvous-bl-corner = 4; # Bottom left corner - Desktop
             wvous-br-corner = 3; # Bottom right corner - Mission Control
             wvous-tl-corner = 11; # Top left corner - Launchpad
@@ -215,11 +212,21 @@
             LoginwindowText = "contact@ranokay.com"; # Text to be shown on the login window
             GuestEnabled = false; # Allow users to login to the machine as guests
           };
+          LaunchServices = {
+            LSQuarantine = false; # Disable the "Are you sure you want to open this application?" dialog
+          };
           NSGlobalDomain = {
+            AppleShowAllExtensions = true;
             AppleICUForce24HourTime = true;
+            ApplePressAndHoldEnabled = false; # Disable press-and-hold for keys in favor of key repeat
             AppleInterfaceStyle = "Dark";
             KeyRepeat = 2;
+            InitialKeyRepeat = 15;
             "com.apple.mouse.tapBehavior" = 1; # Enables tap to click
+          };
+          trackpad = {
+            Clicking = true; # Enable tap to click
+            TrackpadThreeFingerDrag = true; # Enable three finger drag
           };
         };
 
@@ -239,6 +246,7 @@
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#simple
     darwinConfigurations."mbp" = darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
       modules = [
         configuration
         homebrew.darwinModules.nix-homebrew

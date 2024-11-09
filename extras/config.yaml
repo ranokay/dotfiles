@@ -1,0 +1,114 @@
+---
+app_layout:
+- - folder_layout:
+    - - Shortcuts
+      - TextEdit
+      - Font Book
+      - Digital Color Meter
+      - ColorSync Utility
+      - Bluetooth File Exchange
+      - Disk Utility
+      - Activity Monitor
+      - AirPort Utility
+      - LogiPluginService
+    folder_title: Other
+  - folder_layout:
+    - - Epic Games Launcher
+      - NVIDIA GeForce NOW
+      - Steam
+    folder_title: Games
+  - folder_layout:
+    - - Visual Studio Code
+      - Warp
+      - Cursor
+      - Zed
+      - JetBrains Toolbox
+      - OrbStack
+      - Dataflare
+      - Expo Orbit
+    folder_title: Development
+  - App Store
+  - Safari
+  - Mail
+  - Calendar
+  - Maps
+  - Find My
+  - Photos
+  - Freeform
+  - Passwords
+  - VLC
+  - CrossOver
+  - Nextcloud
+  - LuLu
+  - 1Password
+  - Raycast
+  - Figma
+  - BetterDisplay
+  - Bartender 5
+  - VMware Fusion
+  - Telegram
+  - Notion
+  - Free Download Manager
+  - CleanMyMac
+  - balenaEtcher
+  - Arc
+  - Rectangle Pro
+  - Clamshell
+  - Sentinel
+  - RustDesk
+  - 1Password for Safari
+  - Brave Browser
+  - Logi Options+
+  - Whisky
+  - The Unarchiver
+  - Shottr
+  - Yubico Authenticator
+  - Microsoft Teams
+  - AnyDesk
+  - AlDente
+  - Tailscale
+  - Nicotine+
+  - Spotify
+
+hidden_apps:
+  - Stocks
+  - TV
+  - Home
+  - Podcasts
+  - Music
+  - System Settings
+  - Messages
+  - Reminders
+  - FaceTime
+  - Time Machine
+  - Contacts
+  - QuickTime Player
+  - Dictionary
+  - Voice Memos
+  - Weather
+  - Books
+  - Clock
+  - Calculator
+  - Screen Sharing
+  - Mission Control
+  - Stickies
+  - Grapher
+  - VoiceOver Utility
+  - Print Center
+  - Automator
+  - Script Editor
+  - Console
+  - Terminal
+  - Audio MIDI Setup
+  - Preview
+  - Screenshot
+  - Image Capture
+  - Migration Assistant
+  - iPhone Mirroring
+  - Photo Booth
+  - Notes
+  - Siri
+  - Tips
+  - Chess
+  - System Information
+  - News

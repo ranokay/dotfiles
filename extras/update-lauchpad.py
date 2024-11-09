@@ -9,7 +9,6 @@ from time import sleep
 
 import yaml
 
-
 # Colours
 BOLD = '\033[1m'
 RED = '\033[91m'
@@ -25,6 +24,49 @@ class Types(object):
     PAGE = 3
     APP = 4
     DOWNLOADING_APP = 5
+
+def hide_apps(conn, apps_to_hide):
+    """
+    Hides the specified apps from Launchpad by removing them from the apps table.
+    The apps will still be installed and accessible via Spotlight.
+    
+    :param conn: The SQLite connection.
+    :param apps_to_hide: List of app titles to hide from Launchpad.
+    """
+    if not apps_to_hide:
+        return
+        
+    cursor = conn.cursor()
+    
+    print(f'{BLUE}Hiding specified apps from Launchpad{ENDC}')
+    
+    for app in apps_to_hide:
+        try:
+            # First remove from items table to maintain referential integrity
+            cursor.execute('''
+                DELETE FROM items 
+                WHERE rowid IN (
+                    SELECT item_id 
+                    FROM apps 
+                    WHERE title = ?
+                )
+            ''', (app,))
+            
+            # Then remove from apps table
+            cursor.execute('''
+                DELETE FROM apps 
+                WHERE title = ?
+            ''', (app,))
+            
+            if cursor.rowcount > 0:
+                print(f'{GREEN}Successfully hidden {app}{ENDC}')
+            else:
+                print(f'{YELLOW}App {app} not found in Launchpad{ENDC}')
+                
+        except sqlite3.Error as e:
+            print(f'{RED}Error hiding {app}: {e}{ENDC}')
+            
+    conn.commit()
 
 def batch(items, batch_size):
     """
@@ -297,6 +339,7 @@ def build_launchpad(config, rebuild_db=True, restart_upon_completion=True):
     :param restart_upon_completion: Whether or not to restart Launchpad services upon completion.
     """
     app_layout = config['app_layout']
+    hidden_apps = config.get('hidden_apps', [])  # Get hidden_apps list, empty if not specified
 
     # Determine the location of the SQLite Launchpad database
     launchpad_db_dir = get_launchpad_db_dir()
@@ -321,6 +364,9 @@ def build_launchpad(config, rebuild_db=True, restart_upon_completion=True):
 
     # Connect to the Launchpad SQLite database
     conn = sqlite3.connect(launchpad_db_path)
+
+    # Hide specified apps before proceeding with layout
+    hide_apps(conn, hidden_apps)
 
     app_mapping, app_max_id = get_mapping(conn, 'apps')
 
@@ -506,6 +552,7 @@ def extract_launchpad():
     # Build the current layout and return it to the caller
     layout = {
         'app_layout': build_layout(launchpad_root, parent_mapping),
+        'hidden_apps': []  # Add empty hidden_apps list when extracting current layout
     }
 
     return layout
