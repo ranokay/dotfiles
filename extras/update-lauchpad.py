@@ -17,6 +17,8 @@ YELLOW = '\033[93m'
 BLUE = '\033[94m'
 ENDC = '\033[0m'
 
+# defaults write com.apple.dock springboard-columns -int 9
+# defaults write com.apple.dock springboard-rows -int 6; killall Dock
 
 class Types(object):
     ROOT = 1

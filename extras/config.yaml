@@ -74,7 +74,7 @@ app_layout:
         - Maps
         - Photos
         - Shortcuts
-    folder_title: System Utilities
+    folder_title: Other
 
   - folder_layout:
       - - AlDente
