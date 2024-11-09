@@ -29,6 +29,7 @@ def hide_apps(conn, apps_to_hide):
     """
     Hides the specified apps from Launchpad by removing them from the apps table.
     The apps will still be installed and accessible via Spotlight.
+    First checks if the app exists in Launchpad before attempting to hide it.
     
     :param conn: The SQLite connection.
     :param apps_to_hide: List of app titles to hide from Launchpad.
@@ -37,11 +38,26 @@ def hide_apps(conn, apps_to_hide):
         return
         
     cursor = conn.cursor()
+    successfully_hidden = []
     
-    print(f'{BLUE}Hiding specified apps from Launchpad{ENDC}')
+    print(f'{BLUE}Processing apps to hide from Launchpad{ENDC}')
     
     for app in apps_to_hide:
         try:
+            # First check if the app exists in Launchpad
+            cursor.execute('''
+                SELECT COUNT(*) 
+                FROM apps 
+                WHERE title = ?
+            ''', (app,))
+            
+            exists = cursor.fetchone()[0] > 0
+            
+            if not exists:
+                print(f'{YELLOW}App {app} not found in Launchpad{ENDC}')
+                continue
+                
+            # App exists, proceed with hiding it
             # First remove from items table to maintain referential integrity
             cursor.execute('''
                 DELETE FROM items 
@@ -58,15 +74,13 @@ def hide_apps(conn, apps_to_hide):
                 WHERE title = ?
             ''', (app,))
             
-            if cursor.rowcount > 0:
-                print(f'{GREEN}Successfully hidden {app}{ENDC}')
-            else:
-                print(f'{YELLOW}App {app} not found in Launchpad{ENDC}')
+            successfully_hidden.append(app)
                 
         except sqlite3.Error as e:
-            print(f'{RED}Error hiding {app}: {e}{ENDC}')
-            
-    conn.commit()
+            print(f'{RED}Error processing {app}: {e}{ENDC}')
+    
+    if successfully_hidden:
+        print(f'{GREEN}Successfully hidden: {", ".join(successfully_hidden)}{ENDC}')
 
 def batch(items, batch_size):
     """
