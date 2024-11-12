@@ -1,95 +1,101 @@
 ---
 app_layout:
-- - folder_layout:
-      - - Arc
-        - Brave Browser
-        - Safari
-    folder_title: Browsers
+  - - folder_layout:
+        - - Arc
+          - Brave Browser
+          - Safari
+          - Zen Browser
+      folder_title: Browsers
 
-  - folder_layout:
-      - - 1Password
-        - 1Password for Safari
-        - LuLu
-        - Passwords
-        - Sentinel
-        - Tailscale
-        - Yubico Authenticator
-    folder_title: Security & Privacy
+    - folder_layout:
+        - - 1Password
+          - 1Password for Safari
+          - LuLu
+          - Passwords
+          - Sentinel
+          - Tailscale
+          - Yubico Authenticator
+      folder_title: Security & Privacy
 
-  - folder_layout:
-      - - Figma
-        - Freeform
-    folder_title: Design
+    - folder_layout:
+        - - Figma
+          - Freeform
+      folder_title: Design
 
-  - folder_layout:
-      - - Cursor
-        - Dataflare
-        - Expo Orbit
-        - JetBrains Toolbox
-        - OrbStack
-        - Visual Studio Code
-        - Warp
-        - Zed
-    folder_title: Development
+    - folder_layout:
+        - - Android Studio
+          - Claude
+          - Cursor
+          - Dataflare
+          - Expo Orbit
+          - IntelliJ IDEA Ultimate
+          - JetBrains Toolbox
+          - OrbStack
+          - Visual Studio Code
+          - Warp
+          - Zed
+      folder_title: Development
 
-  - folder_layout:
-      - - Epic Games Launcher
-        - NVIDIA GeForce NOW
-        - Steam
-        - Whisky
-    folder_title: Gaming
+    - folder_layout:
+        - - Epic Games Launcher
+          - NVIDIA GeForce NOW
+          - Steam
+          - Whisky
+          - Yaagl OS
+      folder_title: Games
 
-  - folder_layout:
-      - - CrossOver
-        - RustDesk
-        - VMware Fusion
-    folder_title: VM & Remote
+    - folder_layout:
+        - - CrossOver
+          - RustDesk
+          - VMware Fusion
+      folder_title: VM & Remote
 
-  - folder_layout:
-      - - Microsoft Teams
-        - Notion
-        - Telegram
-    folder_title: Social
+    - folder_layout:
+        - - Lunatask
+          - Microsoft Teams
+          - Notion
+          - Telegram
+      folder_title: Social
 
-  - folder_layout:
-      - - Spotify
-        - VLC
-    folder_title: Media
+    - folder_layout:
+        - - Spotify
+          - VLC
+      folder_title: Media
 
-  - folder_layout:
-      - - Free Download Manager
-        - Nextcloud
-        - Nicotine+
-    folder_title: File Sharing
+    - folder_layout:
+        - - Free Download Manager
+          - Nextcloud
+          # - Nicotine+
+      folder_title: File Sharing
 
-  - folder_layout:
-      - - Activity Monitor
-        - AirPort Utility
-        - Bluetooth File Exchange
-        - ColorSync Utility
-        - Digital Color Meter
-        - Disk Utility
-        - Find My
-        - LogiPluginService
-        - Maps
-        - Photos
-        - Shortcuts
-    folder_title: Other
+    - folder_layout:
+        - - Activity Monitor
+          - AirPort Utility
+          - Bluetooth File Exchange
+          - ColorSync Utility
+          - Digital Color Meter
+          - Disk Utility
+          - Find My
+          - LogiPluginService
+          - Maps
+          - Photos
+          - Shortcuts
+      folder_title: Other
 
-  - folder_layout:
-      - - AlDente
-        - AnyDesk
-        - balenaEtcher
-        - Bartender 5
-        - BetterDisplay
-        - CleanMyMac
-        - Clamshell
-        - Logi Options+
-        - Raycast
-        - Rectangle Pro
-        - Shottr
-        - The Unarchiver
-    folder_title: Utilities
+    - folder_layout:
+        - - AlDente
+          - AnyDesk
+          - balenaEtcher
+          - Bartender 5
+          - BetterDisplay
+          - CleanMyMac
+          - Clamshell
+          - Logi Options+
+          - Raycast
+          - Rectangle Pro
+          - Shottr
+          - The Unarchiver
+      folder_title: Utilities
 
 hidden_apps:
   - Stocks

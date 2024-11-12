@@ -22,6 +22,7 @@
       url = "github:homebrew/homebrew-bundle";
       flake = false;
     };
+
     alienator88 = {
       url = "github:alienator88/homebrew-cask";
       flake = false;
@@ -106,6 +107,7 @@
           "notion"
           "telegram"
           "microsoft-teams"
+          "lunatask"
 
           # Cloud
           "nextcloud"
@@ -130,6 +132,10 @@
           # Browsers
           "arc"
           "brave-browser"
+          "zen-browser"
+
+          # AI
+          "claude"
 
           # Utilities
           "the-unarchiver"

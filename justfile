@@ -42,3 +42,18 @@ fi
     echo -e "\033[34m[INFO]\033[0m Cleaning up old Nix generations..."
     nix-collect-garbage -d
     echo -e "\033[32m[SUCCESS]\033[0m Old generations cleaned up."
+
+# Command: Update the Nix-Darwin flake
+@update:
+    {{check-nix-darwin}}
+    echo -e "\033[34m[INFO]\033[0m Updating the Nix-Darwin flake..."
+    nix flake update
+    echo -e "\033[32m[SUCCESS]\033[0m Flake updated successfully."
+
+# Command: Update launchpad (from extras module using python)
+@update-launchpad:
+    echo -e "\033[34m[INFO]\033[0m Updating Launchpad..."
+    defaults write com.apple.dock springboard-columns -int 9 && \
+    defaults write com.apple.dock springboard-rows -int 6 && \
+    python3 extras/update-launchpad.py build extras/config.yaml
+    echo -e "\033[32m[SUCCESS]\033[0m Launchpad updated successfully."

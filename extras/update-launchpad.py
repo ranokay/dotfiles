@@ -10,15 +10,13 @@ from time import sleep
 import yaml
 
 # Colours
-BOLD = '\033[1m'
-RED = '\033[91m'
-GREEN = '\033[92m'
-YELLOW = '\033[93m'
-BLUE = '\033[94m'
-ENDC = '\033[0m'
+BOLD = "\033[1m"
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+BLUE = "\033[94m"
+ENDC = "\033[0m"
 
-# defaults write com.apple.dock springboard-columns -int 9
-# defaults write com.apple.dock springboard-rows -int 6; killall Dock
 
 class Types(object):
     ROOT = 1
@@ -27,62 +25,73 @@ class Types(object):
     APP = 4
     DOWNLOADING_APP = 5
 
+
 def hide_apps(conn, apps_to_hide):
     """
     Hides the specified apps from Launchpad by removing them from the apps table.
     The apps will still be installed and accessible via Spotlight.
     First checks if the app exists in Launchpad before attempting to hide it.
-    
+
     :param conn: The SQLite connection.
     :param apps_to_hide: List of app titles to hide from Launchpad.
     """
     if not apps_to_hide:
         return
-        
+
     cursor = conn.cursor()
     successfully_hidden = []
-    
-    print(f'{BLUE}Processing apps to hide from Launchpad{ENDC}')
-    
+
+    print(f"{BLUE}Processing apps to hide from Launchpad{ENDC}")
+
     for app in apps_to_hide:
         try:
             # First check if the app exists in Launchpad
-            cursor.execute('''
-                SELECT COUNT(*) 
-                FROM apps 
+            cursor.execute(
+                """
+                SELECT COUNT(*)
+                FROM apps
                 WHERE title = ?
-            ''', (app,))
-            
+            """,
+                (app,),
+            )
+
             exists = cursor.fetchone()[0] > 0
-            
+
             if not exists:
-                print(f'{YELLOW}App {app} not found in Launchpad{ENDC}')
+                print(f"{YELLOW}App {app} not found in Launchpad{ENDC}")
                 continue
-                
+
             # App exists, proceed with hiding it
             # First remove from items table to maintain referential integrity
-            cursor.execute('''
-                DELETE FROM items 
+            cursor.execute(
+                """
+                DELETE FROM items
                 WHERE rowid IN (
-                    SELECT item_id 
-                    FROM apps 
+                    SELECT item_id
+                    FROM apps
                     WHERE title = ?
                 )
-            ''', (app,))
-            
+            """,
+                (app,),
+            )
+
             # Then remove from apps table
-            cursor.execute('''
-                DELETE FROM apps 
+            cursor.execute(
+                """
+                DELETE FROM apps
                 WHERE title = ?
-            ''', (app,))
-            
+            """,
+                (app,),
+            )
+
             successfully_hidden.append(app)
-                
+
         except sqlite3.Error as e:
-            print(f'{RED}Error processing {app}: {e}{ENDC}')
-    
+            print(f"{RED}Error processing {app}: {e}{ENDC}")
+
     if successfully_hidden:
         print(f'{GREEN}Successfully hidden: {", ".join(successfully_hidden)}{ENDC}')
+
 
 def batch(items, batch_size):
     """
@@ -93,20 +102,20 @@ def batch(items, batch_size):
     """
     length = len(items)
     for index in range(0, length, batch_size):
-        yield items[index:min(index + batch_size, length)]
+        yield items[index : min(index + batch_size, length)]
 
 
 def generate_uuid():
     """Generate a UUID using uuidgen."""
-    return subprocess.check_output('uuidgen').decode('utf-8').strip()
+    return subprocess.check_output("uuidgen").decode("utf-8").strip()
 
 
 def get_launchpad_db_dir():
     """Determines the user's Launchpad database directory containing the SQLite database."""
-    darwin_user_dir = subprocess.check_output(
-        ['getconf', 'DARWIN_USER_DIR']
-    ).decode('utf-8').strip()
-    return os.path.join(darwin_user_dir, 'com.apple.dock.launchpad', 'db')
+    darwin_user_dir = (
+        subprocess.check_output(["getconf", "DARWIN_USER_DIR"]).decode("utf-8").strip()
+    )
+    return os.path.join(darwin_user_dir, "com.apple.dock.launchpad", "db")
 
 
 def get_mapping(conn, table):
@@ -120,11 +129,11 @@ def get_mapping(conn, table):
              the title and (id, uuid, flags) for each item.  The second item contains the maximum
              id of the items found.
     """
-    cursor = conn.execute(f'''
+    cursor = conn.execute(f"""
         SELECT {table}.item_id, {table}.title, items.uuid, items.flags
         FROM {table}
         JOIN items ON items.rowid = {table}.item_id
-    ''')
+    """)
 
     mapping = {}
     max_id = 0
@@ -161,7 +170,7 @@ def add_missing_items(layout, mapping):
         for item in page:
             # Folders
             if isinstance(item, dict):
-                folder_layout = item['folder_layout']
+                folder_layout = item["folder_layout"]
 
                 for folder_page in folder_layout:
                     for title in folder_page:
@@ -202,25 +211,28 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
 
     # Iterate through pages
     for page_ordering, page in enumerate(layout):
-
         # Start a new page (note that the ordering starts at 1 instead of 0 as there is a
         # holding page at an ordering of 0)
         group_id += 1
 
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO items
             (rowid, uuid, flags, type, parent_id, ordering)
             VALUES
             (?, ?, 2, ?, ?, ?)
-        ''', (group_id, generate_uuid(), Types.PAGE, root_parent_id, page_ordering + 1)
+        """,
+            (group_id, generate_uuid(), Types.PAGE, root_parent_id, page_ordering + 1),
         )
 
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO groups
             (item_id, category_id, title)
             VALUES
             (?, null, null)
-        ''', (group_id,)
+        """,
+            (group_id,),
         )
         conn.commit()
 
@@ -232,26 +244,36 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
         for item in page:
             # A folder has been encountered
             if isinstance(item, dict):
-                folder_title = item['folder_title']
-                folder_layout = item['folder_layout']
+                folder_title = item["folder_title"]
+                folder_layout = item["folder_layout"]
 
                 # Start a new folder
                 group_id += 1
 
-                cursor.execute('''
+                cursor.execute(
+                    """
                     INSERT INTO items
                     (rowid, uuid, flags, type, parent_id, ordering)
                     VALUES
                     (?, ?, 0, ?, ?, ?)
-                ''', (group_id, generate_uuid(), Types.FOLDER_ROOT, page_parent_id, item_ordering)
+                """,
+                    (
+                        group_id,
+                        generate_uuid(),
+                        Types.FOLDER_ROOT,
+                        page_parent_id,
+                        item_ordering,
+                    ),
                 )
 
-                cursor.execute('''
+                cursor.execute(
+                    """
                     INSERT INTO groups
                     (item_id, category_id, title)
                     VALUES
                     (?, null, ?)
-                    ''', (group_id, folder_title)
+                    """,
+                    (group_id, folder_title),
                 )
                 conn.commit()
 
@@ -265,22 +287,30 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
                     # Start a new folder page
                     group_id += 1
 
-                    cursor.execute('''
+                    cursor.execute(
+                        """
                         INSERT INTO items
                         (rowid, uuid, flags, type, parent_id, ordering)
                         VALUES
                         (?, ?, 2, ?, ?, ?)
-                    ''', (
-                        group_id, generate_uuid(), Types.PAGE, folder_root_parent_id,
-                        folder_page_ordering)
+                    """,
+                        (
+                            group_id,
+                            generate_uuid(),
+                            Types.PAGE,
+                            folder_root_parent_id,
+                            folder_page_ordering,
+                        ),
                     )
 
-                    cursor.execute('''
+                    cursor.execute(
+                        """
                         INSERT INTO groups
                         (item_id, category_id, title)
                         VALUES
                         (?, null, null)
-                    ''', (group_id,)
+                    """,
+                        (group_id,),
                     )
                     conn.commit()
 
@@ -288,11 +318,12 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
                     folder_item_ordering = 0
                     for title in folder_page:
                         if title not in mapping:
-                            print(f'{RED}Unable to find item {title}, skipping{ENDC}')
+                            print(f"{RED}Unable to find item {title}, skipping{ENDC}")
                             continue
 
                         item_id, uuid, flags = mapping[title]
-                        cursor.execute('''
+                        cursor.execute(
+                            """
                             UPDATE items
                             SET uuid = ?,
                                 flags = ?,
@@ -300,14 +331,15 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
                                 parent_id = ?,
                                 ordering = ?
                             WHERE rowid = ?
-                        ''', (
+                        """,
+                            (
                                 uuid,
                                 flags,
                                 type_,
                                 group_id,
                                 folder_item_ordering,
-                                item_id
-                            )
+                                item_id,
+                            ),
                         )
                         conn.commit()
 
@@ -317,11 +349,12 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
             else:
                 title = item
                 if title not in mapping:
-                    print(f'{RED}Unable to find item {title}, skipping{ENDC}')
+                    print(f"{RED}Unable to find item {title}, skipping{ENDC}")
                     continue
 
                 item_id, uuid, flags = mapping[title]
-                cursor.execute('''
+                cursor.execute(
+                    """
                     UPDATE items
                     SET uuid = ?,
                         flags = ?,
@@ -329,14 +362,8 @@ def setup_items(conn, type_, layout, mapping, group_id, root_parent_id):
                         parent_id = ?,
                         ordering = ?
                     WHERE rowid = ?
-                ''', (
-                        uuid,
-                        flags,
-                        type_,
-                        page_parent_id,
-                        item_ordering,
-                        item_id
-                    )
+                """,
+                    (uuid, flags, type_, page_parent_id, item_ordering, item_id),
                 )
                 conn.commit()
 
@@ -354,28 +381,32 @@ def build_launchpad(config, rebuild_db=True, restart_upon_completion=True):
     :param rebuild_db: Whether or not to re-build the Launchpad database before starting.
     :param restart_upon_completion: Whether or not to restart Launchpad services upon completion.
     """
-    app_layout = config['app_layout']
-    hidden_apps = config.get('hidden_apps', [])  # Get hidden_apps list, empty if not specified
+    app_layout = config["app_layout"]
+    hidden_apps = config.get(
+        "hidden_apps", []
+    )  # Get hidden_apps list, empty if not specified
 
     # Determine the location of the SQLite Launchpad database
     launchpad_db_dir = get_launchpad_db_dir()
-    launchpad_db_path = os.path.join(launchpad_db_dir, 'db')
+    launchpad_db_path = os.path.join(launchpad_db_dir, "db")
 
-    print(f'{BLUE}Using Launchpad database {launchpad_db_path}{ENDC}')
+    print(f"{BLUE}Using Launchpad database {launchpad_db_path}{ENDC}")
 
     # Re-build the user's database if requested
     if rebuild_db:
         # Delete original Launchpad database and rebuild it for a fresh start
-        print(f'{BLUE}Deleting Launchpad database files to perform database rebuild{ENDC}')
-        for launchpad_db_file in ['db', 'db-shm', 'db-wal']:
+        print(
+            f"{BLUE}Deleting Launchpad database files to perform database rebuild{ENDC}"
+        )
+        for launchpad_db_file in ["db", "db-shm", "db-wal"]:
             try:
                 os.remove(os.path.join(launchpad_db_dir, launchpad_db_file))
             except OSError:
                 pass
 
         # Restart the Dock to get a freshly built database to work from
-        print(f'{BLUE}Restarting the Dock to build a fresh Launchpad databases{ENDC}')
-        subprocess.call(['killall', 'Dock'])
+        print(f"{BLUE}Restarting the Dock to build a fresh Launchpad databases{ENDC}")
+        subprocess.call(["killall", "Dock"])
         sleep(3)
 
     # Connect to the Launchpad SQLite database
@@ -384,7 +415,7 @@ def build_launchpad(config, rebuild_db=True, restart_upon_completion=True):
     # Hide specified apps before proceeding with layout
     hide_apps(conn, hidden_apps)
 
-    app_mapping, app_max_id = get_mapping(conn, 'apps')
+    app_mapping, app_max_id = get_mapping(conn, "apps")
 
     # We will begin our group records using the max ids found (groups always appear after
     # apps)
@@ -393,71 +424,81 @@ def build_launchpad(config, rebuild_db=True, restart_upon_completion=True):
     # Add any missing apps from the user's layout to one or more pages after those defined
     missing_app_items = add_missing_items(app_layout, app_mapping)
     if missing_app_items:
-        print(f'{RED}Uncategorised apps found and added to the last page:{ENDC}')
+        print(f"{RED}Uncategorised apps found and added to the last page:{ENDC}")
         for missing_app_item in missing_app_items:
-            print(f'{RED}- {missing_app_item}{ENDC}')
+            print(f"{RED}- {missing_app_item}{ENDC}")
 
     # Grab a cursor for our operations
     cursor = conn.cursor()
 
-    print(f'{BLUE}Rebuilding the Launchpad database{ENDC}')
+    print(f"{BLUE}Rebuilding the Launchpad database{ENDC}")
 
     # Clear all items related to groups so we can re-create them
-    cursor.execute('''
+    cursor.execute(
+        """
         DELETE FROM items
         WHERE type IN (?, ?, ?)
-    ''', (Types.ROOT, Types.FOLDER_ROOT, Types.PAGE))
+    """,
+        (Types.ROOT, Types.FOLDER_ROOT, Types.PAGE),
+    )
     conn.commit()
 
     # Disable triggers on the items table temporarily so that we may create the rows with our
     # required ordering (including items which have an ordering of 0)
-    cursor.execute('''
+    cursor.execute("""
         UPDATE dbinfo
         SET value = 1
         WHERE key = 'ignore_items_update_triggers'
-    ''')
+    """)
     conn.commit()
 
     # Add root and holding pages to items and groups
     for rowid, uuid, type_, parent_id in [
         # Root for Launchpad apps
-        (1, 'ROOTPAGE', Types.ROOT, 0),
-        (2, 'HOLDINGPAGE', Types.PAGE, 1),
-
+        (1, "ROOTPAGE", Types.ROOT, 0),
+        (2, "HOLDINGPAGE", Types.PAGE, 1),
         # Root for Launchpad version
-        (5, 'ROOTPAGE_VERS', Types.ROOT, 0),
-        (6, 'HOLDINGPAGE_VERS', Types.PAGE, 5)
+        (5, "ROOTPAGE_VERS", Types.ROOT, 0),
+        (6, "HOLDINGPAGE_VERS", Types.PAGE, 5),
     ]:
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO items
             (rowid, uuid, flags, type, parent_id, ordering)
             VALUES (?, ?, null, ?, ?, 0)
-        ''', (rowid, uuid, type_, parent_id))
+        """,
+            (rowid, uuid, type_, parent_id),
+        )
 
-        cursor.execute('''
+        cursor.execute(
+            """
             INSERT INTO groups
             (item_id, category_id, title)
             VALUES
             (?, null, null)
-        ''', (rowid,))
+        """,
+            (rowid,),
+        )
 
         conn.commit()
 
     # Setup the apps
-    group_id = setup_items(conn, Types.APP, app_layout, app_mapping, group_id, root_parent_id=1)
+    group_id = setup_items(
+        conn, Types.APP, app_layout, app_mapping, group_id, root_parent_id=1
+    )
 
     # Enable triggers on the items again so ordering is auto-generated
-    cursor.execute('''
+    cursor.execute("""
         UPDATE dbinfo
         SET value = 0
         WHERE key = 'ignore_items_update_triggers'
-    ''')
+    """)
     conn.commit()
 
     if restart_upon_completion:
         # Restart the Dock to that Launchpad can read our new and updated database
-        print(f'{BLUE}Restarting the Dock to apply the new database{ENDC}')
-        subprocess.call(['killall', 'Dock'])
+        print(f"{BLUE}Restarting the Dock to apply the new database{ENDC}")
+        subprocess.call(["killall", "Dock"])
 
 
 def build_layout(root, parent_mapping):
@@ -484,10 +525,7 @@ def build_layout(root, parent_mapping):
             # A folder has been encountered
             elif type_ == Types.FOLDER_ROOT:
                 # Start a dict for the folder with its title and layout
-                folder = {
-                    'folder_title': group_title,
-                    'folder_layout': []
-                }
+                folder = {"folder_title": group_title, "folder_layout": []}
 
                 # Iterate through folder pages
                 for folder_page_id, _, _, _ in parent_mapping[id]:
@@ -495,16 +533,17 @@ def build_layout(root, parent_mapping):
 
                     # Iterate through folder items
                     for (
-                        folder_item_id, folder_item_type, folder_item_app_title,
-                        folder_group_title
+                        folder_item_id,
+                        folder_item_type,
+                        folder_item_app_title,
+                        folder_group_title,
                     ) in parent_mapping[folder_page_id]:
-
                         # An app has been encountered which is being added to the folder page
                         if folder_item_type == Types.APP:
                             folder_page_items.append(folder_item_app_title)
 
                     # Add the page to the folder
-                    folder['folder_layout'].append(folder_page_items)
+                    folder["folder_layout"].append(folder_page_items)
 
                 # Add the folder item to the page
                 page_items.append(folder)
@@ -518,19 +557,19 @@ def build_layout(root, parent_mapping):
 def extract_launchpad():
     # Determine the location of the SQLite Launchpad database
     launchpad_db_dir = get_launchpad_db_dir()
-    launchpad_db_path = os.path.join(launchpad_db_dir, 'db')
+    launchpad_db_path = os.path.join(launchpad_db_dir, "db")
 
-    print(f'{BLUE}Using Launchpad database {launchpad_db_path}{ENDC}')
+    print(f"{BLUE}Using Launchpad database {launchpad_db_path}{ENDC}")
 
     # Connect to the Launchpad SQLite database
     conn = sqlite3.connect(launchpad_db_path)
 
     # Obtain the root elements for Launchpad apps
-    cursor = conn.execute('''
+    cursor = conn.execute("""
         SELECT key, value
         FROM dbinfo
         WHERE key IN ('launchpad_root');
-    ''')
+    """)
 
     while True:
         row = cursor.fetchone()
@@ -538,22 +577,22 @@ def extract_launchpad():
             break
 
         key, value = row
-        if key == 'launchpad_root':
+        if key == "launchpad_root":
             launchpad_root = int(value)
 
     # Obtain all items and their associated titles
-    cursor = conn.execute('''
+    cursor = conn.execute("""
         SELECT items.rowid, items.parent_id, items.type,
-               apps.title AS app_title,
-               groups.title AS group_title
+                apps.title AS app_title,
+                groups.title AS group_title
         FROM items
         LEFT JOIN apps ON apps.item_id = items.rowid
         LEFT JOIN groups ON groups.item_id = items.rowid
         WHERE items.uuid NOT IN ('ROOTPAGE', 'HOLDINGPAGE',
-                                 'ROOTPAGE_DB', 'HOLDINGPAGE_DB',
-                                 'ROOTPAGE_VERS', 'HOLDINGPAGE_VERS')
+                                'ROOTPAGE_DB', 'HOLDINGPAGE_DB',
+                                'ROOTPAGE_VERS', 'HOLDINGPAGE_VERS')
         ORDER BY items.parent_id, items.ordering
-    ''')
+    """)
 
     # Build a mapping between the parent_id and the associated items
     parent_mapping = defaultdict(list)
@@ -567,8 +606,8 @@ def extract_launchpad():
 
     # Build the current layout and return it to the caller
     layout = {
-        'app_layout': build_layout(launchpad_root, parent_mapping),
-        'hidden_apps': []  # Add empty hidden_apps list when extracting current layout
+        "app_layout": build_layout(launchpad_root, parent_mapping),
+        "hidden_apps": [],  # Add empty hidden_apps list when extracting current layout
     }
 
     return layout
@@ -577,62 +616,73 @@ def extract_launchpad():
 def main():
     # Create the argument parser
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest='command')
+    subparsers = parser.add_subparsers(dest="command")
 
     # Create the parser for the build sub-command
     build_parser = subparsers.add_parser(
-        'build', help='build the launchpad db using the config provided'
+        "build", help="build the launchpad db using the config provided"
     )
-    build_parser.add_argument('config_path', help='the file path of the config to use')
+    build_parser.add_argument("config_path", help="the file path of the config to use")
 
     # Create the parser for the extract sub-command
     extract_parser = subparsers.add_parser(
-        'extract', help='extract the launchpad db into a config file'
+        "extract", help="extract the launchpad db into a config file"
     )
-    extract_parser.add_argument('config_path', help='the file path to extract the config to')
     extract_parser.add_argument(
-        '-f', '--format', choices=['json', 'yaml'], default='yaml',
-        help='the format to extract your config to'
+        "config_path", help="the file path to extract the config to"
+    )
+    extract_parser.add_argument(
+        "-f",
+        "--format",
+        choices=["json", "yaml"],
+        default="yaml",
+        help="the format to extract your config to",
     )
 
     # Create the parser for the compare sub-command
     compare_parser = subparsers.add_parser(
-        'compare', help='compare the launchpad db with the config'
+        "compare", help="compare the launchpad db with the config"
     )
-    compare_parser.add_argument('config_path', help='the file path of the config to compare')
+    compare_parser.add_argument(
+        "config_path", help="the file path of the config to compare"
+    )
 
     # Parse arguments
     args = parser.parse_args()
 
     if not args.command:
-        parser.error('please specify an action to perform')
+        parser.error("please specify an action to perform")
 
     print()
-    print(f'{BOLD}Launchpad Builder{ENDC}')
+    print(f"{BOLD}Launchpad Builder{ENDC}")
     print()
 
     # Build
-    if args.command == 'build':
+    if args.command == "build":
         with open(args.config_path) as f:
             config = yaml.load(f, Loader=yaml.SafeLoader)
 
         build_launchpad(config)
         print(
-            f'{GREEN}Successfully build the Launchpad layout defined in {args.config_path}{ENDC}'
+            f"{GREEN}Successfully build the Launchpad layout defined in {args.config_path}{ENDC}"
         )
 
     # Extract
-    elif args.command == 'extract':
+    elif args.command == "extract":
         layout = extract_launchpad()
-        print(f'{GREEN}Successfully wrote Launchpad config to {args.config_path}{ENDC}')
-        with open(args.config_path, 'w') as f:
-            if args.format == 'yaml':
-                f.write(yaml.safe_dump(layout, default_flow_style=False, explicit_start=True))
+        print(f"{GREEN}Successfully wrote Launchpad config to {args.config_path}{ENDC}")
+        with open(args.config_path, "w") as f:
+            if args.format == "yaml":
+                f.write(
+                    yaml.safe_dump(
+                        layout, default_flow_style=False, explicit_start=True
+                    )
+                )
             else:
                 json.dump(layout, f, indent=2)
 
     # Compare
-    elif args.command == 'compare':
+    elif args.command == "compare":
         with open(args.config_path) as f:
             config = yaml.load(f, Loader=yaml.SafeLoader)
 
@@ -644,5 +694,5 @@ def main():
     print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
