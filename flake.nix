@@ -58,6 +58,7 @@
           just
           neovim
           gh
+          bat
         ];
 
         variables = {
