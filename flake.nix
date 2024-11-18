@@ -59,6 +59,7 @@
           neovim
           gh
           bat
+          eza
         ];
 
         variables = {
@@ -93,6 +94,7 @@
 
           # Virtualization
           "vmware-fusion"
+          "parallels"
           "whisky"
           "crossover"
 
