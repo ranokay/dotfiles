@@ -110,7 +110,7 @@
           "notion"
           "telegram"
           "microsoft-teams"
-          "lunatask"
+          # "lunatask"
 
           # Cloud
           "nextcloud"
@@ -179,6 +179,8 @@
       # Create /etc/zshrc that loads the nix-darwin environment.
       programs.zsh.enable = true; # default shell on catalina
       # programs.fish.enable = true;
+
+      security.pam.enableSudoTouchIdAuth = true; # Enable sudo authentication via Touch ID
 
       system = {
         # activationScripts.launchpadLayout.text = ''
