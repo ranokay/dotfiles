@@ -110,7 +110,7 @@
           "notion"
           "telegram"
           "microsoft-teams"
-          # "lunatask"
+          "lunatask"
 
           # Cloud
           "nextcloud"
@@ -174,7 +174,12 @@
       # nix.package = pkgs.nix;
 
       # Necessary for using flakes on this system.
-      nix.settings.experimental-features = "nix-command flakes";
+      nix = {
+        extraOptions = ''
+          extra-platforms = x86_64-darwin aarch64-darwin
+        '';
+        settings.experimental-features = "nix-command flakes";
+      };
 
       # Create /etc/zshrc that loads the nix-darwin environment.
       programs.zsh.enable = true; # default shell on catalina
