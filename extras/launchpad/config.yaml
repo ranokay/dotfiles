@@ -17,7 +17,10 @@ app_layout:
           - PyCharm Community Edition
           - Visual Studio Code
           - Warp
+          - Xcode
           - Zed
+          - Postman
+          - Prefs Editor
       folder_title: Development
     - folder_layout:
         - - Figma
@@ -36,7 +39,8 @@ app_layout:
       folder_title: Games
     - folder_layout:
         - - Spotify
-          - VLC
+          # - VLC
+          - IINA
       folder_title: Media
     - folder_layout:
         - - Activity Monitor
@@ -79,12 +83,13 @@ app_layout:
           - Rectangle Pro
           - Shottr
           - The Unarchiver
+          - Music Decoy
       folder_title: Utilities
     - folder_layout:
         - - CrossOver
           - Parallels Desktop
-          - Parallels Desktop Activation Tool SIP ON
-          - Parallels Toolbox
+          # - Parallels Desktop Activation Tool SIP ON
+          # - Parallels Toolbox
           - RustDesk
           - VMware Fusion
       folder_title: VM & Remote

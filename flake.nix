@@ -60,6 +60,8 @@
           gh
           bat
           eza
+          fnm
+          bun
         ];
 
         variables = {
@@ -80,6 +82,7 @@
           "zed"
           "orbstack"
           "expo-orbit"
+          "postman"
 
           # Network
           "lulu"
@@ -87,7 +90,6 @@
 
           # Design
           "figma"
-          "figma-agent"
 
           # Database
           "dataflare"
@@ -102,7 +104,8 @@
           "warp"
 
           # Media
-          "vlc"
+          # "vlc"
+          "iina"
           "spotify"
 
           # Communication
@@ -152,10 +155,13 @@
           "rectangle-pro"
           "balenaetcher"
           "logi-options+"
+          "music-decoy"
+          "prefs-editor"
         ];
         masApps = {
           "Clamshell" = 6477896729;
           "1Password for Safari" = 1569813296;
+          "Xcode" = 497799835;
         };
         onActivation = {
           autoUpdate = true;
