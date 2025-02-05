@@ -62,6 +62,7 @@
           eza
           fnm
           bun
+          fish
         ];
 
         variables = {
@@ -96,7 +97,7 @@
 
           # Virtualization
           "vmware-fusion"
-          "parallels"
+          # "parallels"
           "whisky"
           "crossover"
 
@@ -113,7 +114,7 @@
           "notion"
           "telegram"
           "microsoft-teams"
-          "lunatask"
+          # "lunatask"
 
           # Cloud
           "nextcloud"
@@ -121,6 +122,7 @@
           # Remote Desktop
           "rustdesk"
           "anydesk"
+          # "teamviewer"
 
           # File Transfer
           "free-download-manager"
@@ -139,9 +141,6 @@
           "arc"
           "brave-browser"
           "zen-browser"
-
-          # AI
-          "claude"
 
           # Utilities
           "the-unarchiver"

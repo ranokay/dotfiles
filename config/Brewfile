@@ -1,0 +1,88 @@
+# Development
+cask "visual-studio-code"
+cask "jetbrains-toolbox"
+cask "cursor"
+cask "zed"
+cask "orbstack"
+cask "expo-orbit"
+cask "postman"
+
+# Network
+cask "lulu"
+cask "tailscale"
+
+# Design
+cask "figma"
+
+# Database
+cask "dataflare"
+
+# Virtualization
+cask "vmware-fusion"
+cask "whisky"
+cask "crossover"
+
+# Terminal
+cask "warp"
+
+# Media
+cask "iina"
+cask "spotify"
+
+# Communication
+cask "notion"
+cask "telegram"
+cask "microsoft-teams"
+
+# Cloud
+cask "nextcloud"
+
+# Remote Desktop
+cask "rustdesk"
+cask "anydesk"
+
+# File Transfer
+cask "free-download-manager"
+
+# Gaming
+cask "nvidia-geforce-now"
+cask "steam"
+cask "epic-games"
+
+# Security
+cask "1password"
+cask "1password-cli"
+cask "yubico-authenticator"
+
+# Browsers
+cask "arc"
+cask "brave-browser"
+cask "zen-browser"
+
+# Utilities
+cask "the-unarchiver"
+cask "sentinel"
+cask "aldente"
+cask "betterdisplay"
+cask "raycast"
+cask "bartender"
+cask "shottr"
+cask "cleanmymac"
+cask "rectangle-pro"
+cask "balenaetcher"
+cask "logi-options-plus"
+cask "music-decoy"
+cask "prefs-editor"
+
+# Mac App Store
+mas "Clamshell", id: 6477896729
+mas "1Password for Safari", id: 1569813296
+mas "Xcode", id: 497799835
+
+# CLI tools
+brew "gh"
+brew "bat"
+brew "eza"
+brew "fnm"
+brew "bun"
+brew "fish"

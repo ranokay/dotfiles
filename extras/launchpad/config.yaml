@@ -93,49 +93,50 @@ app_layout:
           - RustDesk
           - VMware Fusion
       folder_title: VM & Remote
-hidden_apps:
-  - App Store
-  - Audio MIDI Setup
-  - Automator
-  - Books
-  - Calculator
-  - Calendar
-  - Chess
-  - Clock
-  - Console
-  - Contacts
-  - Dictionary
-  - FaceTime
-  - Font Book
-  - Grapher
-  - Home
-  - Image Capture
-  - iPhone Mirroring
-  - Mail
-  - Messages
-  - Migration Assistant
-  - Mission Control
-  - Music
-  - Notes
-  - Photo Booth
-  - Podcasts
-  - Preview
-  - Print Center
-  - QuickTime Player
-  - Reminders
-  - Screen Sharing
-  - Screenshot
-  - Script Editor
-  - Siri
-  - Stickies
-  - Stocks
-  - System Information
-  - System Settings
-  - TV
-  - Terminal
-  - TextEdit
-  - Time Machine
-  - Tips
-  - Voice Memos
-  - VoiceOver Utility
-  - Weather
+    - folder_layout:
+        - - App Store
+          - Audio MIDI Setup
+          - Automator
+          - Books
+          - Calculator
+          - Calendar
+          - Chess
+          - Clock
+          - Console
+          - Contacts
+          - Dictionary
+          - FaceTime
+          - Font Book
+          - Grapher
+          - Home
+          - Image Capture
+          - iPhone Mirroring
+          - Mail
+          - Messages
+          - Migration Assistant
+          - Mission Control
+          - Music
+          - Notes
+          - Photo Booth
+          - Podcasts
+          - Preview
+          - Print Center
+          - QuickTime Player
+          - Reminders
+          - Screen Sharing
+          - Screenshot
+          - Script Editor
+          - Siri
+          - Stickies
+          - Stocks
+          - System Information
+          - System Settings
+          - TV
+          - Terminal
+          - TextEdit
+          - Time Machine
+          - Tips
+          - Voice Memos
+          - VoiceOver Utility
+          - Weather
+      folder_title: System
