@@ -25,6 +25,29 @@ install_packages() {
         exit 1
     fi
 
+    # Check for packages to uninstall
+    print_info "Checking for packages to uninstall..."
+    local cleanup_list
+    cleanup_list=$(brew bundle cleanup --file="config/Brewfile")
+    
+    if [[ -n "$cleanup_list" ]]; then
+        print_info "The following packages will be uninstalled:"
+        printf "%s\n\n" "$cleanup_list"
+        
+        if ask_confirmation "Do you want to proceed with uninstallation?"; then
+            print_info "Cleaning up packages..."
+            if ! brew bundle cleanup --force --file="config/Brewfile"; then
+                print_error "Failed to clean up some packages"
+                exit 1
+            fi
+            print_success "Packages cleaned up"
+        else
+            print_info "Skipping cleanup"
+        fi
+    else
+        print_info "No packages to uninstall"
+    fi
+
     # Install packages
     if ! brew bundle --file="config/Brewfile"; then
         print_error "Failed to install some packages"

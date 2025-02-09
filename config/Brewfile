@@ -1,109 +1,105 @@
-# Define package groups
-UTILITIES = %w[
-  aldente
-  raycast
-  bartender
-  the-unarchiver
-  sentinel
-  betterdisplay
-  shottr
-  cleanmymac
-  rectangle-pro
-  balenaetcher
-  music-decoy
-  prefs-editor
+# Define packages by type
+casks = [
+    # Utilities
+    'aldente',
+    'raycast',
+    'bartender',
+    'the-unarchiver',
+    # 'sentinel',
+    'betterdisplay',
+    'shottr',
+    'cleanmymac',
+    'rectangle-pro',
+    'balenaetcher',
+    'music-decoy',
+    'prefs-editor',
+    'logi-options+'
+
+    # CLI Tools
+    'warp',
+
+    # Security & Privacy
+    '1password',
+    '1password-cli',
+    'yubico-authenticator',
+
+    # Browsers
+    'arc',
+    'zen-browser',
+
+    # Development
+    'visual-studio-code',
+    'jetbrains-toolbox',
+    'cursor',
+    'zed',
+    'orbstack',
+    'expo-orbit',
+    'postman',
+
+    # Network
+    'lulu',
+    'tailscale',
+
+    # Design
+    'figma',
+
+    # Database
+    'dataflare',
+
+    # Media
+    'iina',
+    'spotify',
+
+    # Cloud Storage
+    'nextcloud',
+
+    # Remote Access
+    'rustdesk',
+    'anydesk',
+
+    # File Transfer
+    'free-download-manager',
+
+    # Social & Communication
+    'discord',
+    'telegram',
+    'microsoft-teams',
+
+    # Virtualization
+    'crossover',
+    'whisky',
+    'vmware-fusion',
+    'virtualbuddy',
+
+    # Productivity
+    'notion'
+
+    # Gaming
+    'steam',
+    'epic-games',
+    'nvidia-geforce-now',
+    
 ]
 
-CLI_TOOLS = %w[
-  gh
-  bat
-  eza
-  fnm
-  fish
-  fastfetch
+brews = [
+    # CLI Tools
+    'gh',
+    'bat',
+    'eza',
+    'fnm',
+    'fish',
+    'fastfetch',
+    'mas'
 ]
 
-SECURITY = %w[
-  1password
-  1password-cli
-  yubico-authenticator
+mas = [
+    # Mac App Store apps
+    { name: 'Clamshell', id: 6477896729 },
+    { name: '1Password for Safari', id: 1569813296 },
+    { name: 'Xcode', id: 497799835 }
 ]
 
-BROWSERS = %w[
-  arc
-  zen-browser
-]
-
-DEVELOPMENT = %w[
-  visual-studio-code
-  jetbrains-toolbox
-  cursor
-  zed
-  orbstack
-  expo-orbit
-  postman
-]
-
-NETWORK = %w[
-  lulu
-  tailscale
-]
-
-DESIGN = %w[
-  figma
-]
-
-DATABASE = %w[
-  dataflare
-]
-
-TERMINAL = %w[
-  warp
-]
-
-MEDIA = %w[
-  iina
-  spotify
-]
-
-CLOUD = %w[
-  nextcloud
-]
-
-REMOTE = %w[
-  rustdesk
-  anydesk
-]
-
-FILE_TRANSFER = %w[
-  free-download-manager
-]
-
-VIRTUALIZATION = %w[
-  virtualbuddy
-]
-
-# Install formulae
-CLI_TOOLS.each { |pkg| brew pkg }
-
-# Install casks
-[
-  UTILITIES,
-  SECURITY,
-  BROWSERS,
-  DEVELOPMENT,
-  NETWORK,
-  DESIGN,
-  DATABASE,
-  TERMINAL,
-  MEDIA,
-  CLOUD,
-  REMOTE,
-  FILE_TRANSFER,
-  VIRTUALIZATION
-].flatten.each { |app| cask app }
-
-# Commented packages for reference
-# mas "Clamshell", id: 6477896729
-# mas "1Password for Safari", id: 1569813296
-# mas "Xcode", id: 497799835
+# Install packages
+casks.each { |app| cask app }
+brews.each { |app| brew app }
+mas.each { |app| mas app[:name], id: app[:id] }
