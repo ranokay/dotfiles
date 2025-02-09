@@ -1,88 +1,109 @@
-# Development
-cask "visual-studio-code"
-cask "jetbrains-toolbox"
-cask "cursor"
-cask "zed"
-cask "orbstack"
-cask "expo-orbit"
-cask "postman"
+# Define package groups
+UTILITIES = %w[
+  aldente
+  raycast
+  bartender
+  the-unarchiver
+  sentinel
+  betterdisplay
+  shottr
+  cleanmymac
+  rectangle-pro
+  balenaetcher
+  music-decoy
+  prefs-editor
+]
 
-# Network
-cask "lulu"
-cask "tailscale"
+CLI_TOOLS = %w[
+  gh
+  bat
+  eza
+  fnm
+  fish
+  fastfetch
+]
 
-# Design
-cask "figma"
+SECURITY = %w[
+  1password
+  1password-cli
+  yubico-authenticator
+]
 
-# Database
-cask "dataflare"
+BROWSERS = %w[
+  arc
+  zen-browser
+]
 
-# Virtualization
-cask "vmware-fusion"
-cask "whisky"
-cask "crossover"
+DEVELOPMENT = %w[
+  visual-studio-code
+  jetbrains-toolbox
+  cursor
+  zed
+  orbstack
+  expo-orbit
+  postman
+]
 
-# Terminal
-cask "warp"
+NETWORK = %w[
+  lulu
+  tailscale
+]
 
-# Media
-cask "iina"
-cask "spotify"
+DESIGN = %w[
+  figma
+]
 
-# Communication
-cask "notion"
-cask "telegram"
-cask "microsoft-teams"
+DATABASE = %w[
+  dataflare
+]
 
-# Cloud
-cask "nextcloud"
+TERMINAL = %w[
+  warp
+]
 
-# Remote Desktop
-cask "rustdesk"
-cask "anydesk"
+MEDIA = %w[
+  iina
+  spotify
+]
 
-# File Transfer
-cask "free-download-manager"
+CLOUD = %w[
+  nextcloud
+]
 
-# Gaming
-cask "nvidia-geforce-now"
-cask "steam"
-cask "epic-games"
+REMOTE = %w[
+  rustdesk
+  anydesk
+]
 
-# Security
-cask "1password"
-cask "1password-cli"
-cask "yubico-authenticator"
+FILE_TRANSFER = %w[
+  free-download-manager
+]
 
-# Browsers
-cask "arc"
-cask "brave-browser"
-cask "zen-browser"
+VIRTUALIZATION = %w[
+  virtualbuddy
+]
 
-# Utilities
-cask "the-unarchiver"
-cask "sentinel"
-cask "aldente"
-cask "betterdisplay"
-cask "raycast"
-cask "bartender"
-cask "shottr"
-cask "cleanmymac"
-cask "rectangle-pro"
-cask "balenaetcher"
-cask "logi-options-plus"
-cask "music-decoy"
-cask "prefs-editor"
+# Install formulae
+CLI_TOOLS.each { |pkg| brew pkg }
 
-# Mac App Store
-mas "Clamshell", id: 6477896729
-mas "1Password for Safari", id: 1569813296
-mas "Xcode", id: 497799835
+# Install casks
+[
+  UTILITIES,
+  SECURITY,
+  BROWSERS,
+  DEVELOPMENT,
+  NETWORK,
+  DESIGN,
+  DATABASE,
+  TERMINAL,
+  MEDIA,
+  CLOUD,
+  REMOTE,
+  FILE_TRANSFER,
+  VIRTUALIZATION
+].flatten.each { |app| cask app }
 
-# CLI tools
-brew "gh"
-brew "bat"
-brew "eza"
-brew "fnm"
-brew "bun"
-brew "fish"
+# Commented packages for reference
+# mas "Clamshell", id: 6477896729
+# mas "1Password for Safari", id: 1569813296
+# mas "Xcode", id: 497799835

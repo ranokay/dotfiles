@@ -1,29 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Set script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Source utility functions
+source "./scripts/utils.sh"
 
-# Source helper scripts
-source "$SCRIPT_DIR/scripts/setup.sh"
-source "$SCRIPT_DIR/scripts/brew.sh"
-source "$SCRIPT_DIR/scripts/macos.sh"
+# Perform initial checks
+source "./scripts/checks.sh"
+check_system
+check_xcode
 
-# Print colored output
-print_info "Starting installation..."
+# Install Homebrew and packages
+source "./scripts/brew.sh"
+install_homebrew
+install_packages
 
-# Check and install Xcode Command Line Tools
-install_xcode_tools
+# Configure Git
+source "./scripts/git.sh"
+configure_git
 
-# Check and install Rosetta 2 (if on Apple Silicon)
-install_rosetta
-
-# Install and configure Homebrew
-setup_homebrew
-
-# Install applications from Brewfile
-install_brew_packages
-
-# Configure macOS settings
-configure_macos
-
-print_success "Installation complete! Some changes may require a restart to take effect."
+# Prompt for system configuration
+if ask_confirmation "Do you want to apply macOS system configuration?"; then
+    source "./scripts/macos.sh"
+    apply_macos_configuration
+else
+    print_success "Installation completed successfully!"
+fi 
