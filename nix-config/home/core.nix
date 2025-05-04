@@ -2,6 +2,7 @@
   home.packages = with pkgs; [
     # archives
     zip
+    skim
     # xz
     # unzip
     # p7zip

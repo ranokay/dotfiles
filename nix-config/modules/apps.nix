@@ -40,13 +40,12 @@
     };
 
     taps = [
-      "homebrew/services"
     ];
 
     brews = [
       # "wget" # download tool
       # "curl" # no not install curl via nixpkgs, it's not working well on macOS!
-      # "aria2" # download tool
+      "aria2" # download tool
       # "httpie" # http client
     ];
 
@@ -61,7 +60,7 @@
       # "discord"
 
       # "anki"
-      # "iina" # video player
+      "iina" # video player
       # "raycast" # (HotKey: alt/option + space)search, caculate and run scripts(with many plugins)
       # "stats" # beautiful system monitor
       # "eudic" # 欧路词典
