@@ -10,15 +10,15 @@ default:
 
 [group('desktop')]
 darwin:
-  nix build .#darwinConfigurations.{{hostname}}.system
+  nix build .#darwinConfigurations.mbp.system
 
-  ./result/sw/bin/darwin-rebuild switch --flake .#{{hostname}}
+  ./result/sw/bin/darwin-rebuild switch --flake .#mbp
 
 [group('desktop')]
 darwin-debug:
-  nix build .#darwinConfigurations.{{hostname}}.system --show-trace --verbose
+  nix build .#darwinConfigurations.mbp.system --show-trace --verbose
 
-  ./result/sw/bin/darwin-rebuild switch --flake .#{{hostname}} --show-trace --verbose
+  ./result/sw/bin/darwin-rebuild switch --flake .#mbp --show-trace --verbose
 
 ############################################################################
 ###  nix related commands
