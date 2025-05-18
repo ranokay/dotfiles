@@ -24,6 +24,7 @@
     ];
 
     brews = [
+      "blacktop/tap/lporg"
     ];
 
     casks = [
