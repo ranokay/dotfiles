@@ -3,7 +3,7 @@
 ###  macOS's System configuration
 ###
 ###  All the configuration options are documented here:
-###    https://daiderd.com/nix-darwin/manual/index.html###sec-options
+###    https://daiderd.com/nix-darwin/manual/index.html#sec-options
 ###  Incomplete list of macOS `defaults` commands :
 ###    https://github.com/yannbertrand/macos-defaults
 ###################################################################################
@@ -134,7 +134,7 @@
 
       loginwindow = {
         GuestEnabled = false; # disable guest user
-        SHOWFULLNAME = true; # show full name in login window
+        LoginwindowText = "contact@ranokay.com";
       };
     };
 

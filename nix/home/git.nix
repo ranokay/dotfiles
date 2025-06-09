@@ -27,12 +27,6 @@
       }
     ];
 
-    extraConfig = {
-      init.defaultBranch = "main";
-      push.autoSetupRemote = true;
-      pull.rebase = true;
-    };
-
     signing = {
       # 1Password SSH GitHub Commit Signing
       key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGOlQ9WC58WUVNYtM0tL1YJHDtCMpnLBhtZ3UcQH3dwj";
@@ -42,6 +36,9 @@
     extraConfig = {
       gpg = {format = "ssh";};
       gpg."ssh".program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
+      init.defaultBranch = "main";
+      push.autoSetupRemote = true;
+      pull.rebase = true;
     };
 
     delta = {
