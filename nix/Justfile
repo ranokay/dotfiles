@@ -5,68 +5,208 @@ default:
   @just --list
 
 ############################################################################
-###  darwin related commands
+###  System rebuild commands
 ############################################################################
 
-[group('desktop')]
+# Build and switch to the current system configuration
+[group('system')]
+rebuild:
+  #!/usr/bin/env bash
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    just darwin
+  else
+    just nixos
+  fi
+
+# Build and switch Darwin configuration
+[group('system')]
 darwin:
-  nix build .#darwinConfigurations.mbp.system
+  nix build .#darwinConfigurations.{{hostname}}.system
+  ./result/sw/bin/darwin-rebuild switch --flake .#{{hostname}}
 
-  ./result/sw/bin/darwin-rebuild switch --flake .#mbp
-
-[group('desktop')]
+# Build and switch Darwin configuration with debug output
+[group('system')]
 darwin-debug:
-  nix build .#darwinConfigurations.mbp.system --show-trace --verbose
+  nix build .#darwinConfigurations.{{hostname}}.system --show-trace --verbose
+  ./result/sw/bin/darwin-rebuild switch --flake .#{{hostname}} --show-trace --verbose
 
-  ./result/sw/bin/darwin-rebuild switch --flake .#mbp --show-trace --verbose
+# Build and test Darwin configuration without switching
+[group('system')]
+darwin-test:
+  nix build .#darwinConfigurations.{{hostname}}.system --dry-run
+
+# Build and switch NixOS configuration (for future use)
+[group('system')]
+nixos:
+  sudo nixos-rebuild switch --flake .#{{hostname}}
+
+# Build and test NixOS configuration without switching
+[group('system')]
+nixos-test:
+  sudo nixos-rebuild build --flake .#{{hostname}}
 
 ############################################################################
-###  nix related commands
+###  Development and maintenance commands
 ############################################################################
 
-# Update all the flake inputs
-[group('nix')]
+# Check flake for errors and formatting issues
+[group('dev')]
+check:
+  nix flake check
+
+# Format all nix files in the repository
+[group('dev')]
+fmt:
+  nix fmt
+
+# Enter development shell
+[group('dev')]
+dev:
+  nix develop
+
+# Show what packages would be built/downloaded
+[group('dev')]
+dry-run:
+  #!/usr/bin/env bash
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    nix build .#darwinConfigurations.{{hostname}}.system --dry-run
+  else
+    nix build .#nixosConfigurations.{{hostname}}.system --dry-run
+  fi
+
+############################################################################
+###  Flake management commands
+############################################################################
+
+# Update all flake inputs
+[group('flake')]
 up:
   nix flake update
 
-# Update specific input
-# Usage: just upp nixpkgs
-[group('nix')]
+# Update specific input (usage: just upp nixpkgs)
+[group('flake')]
 upp input:
   nix flake update {{input}}
 
+# Show flake info
+[group('flake')]
+info:
+  nix flake show
+
+# Show flake metadata
+[group('flake')]
+metadata:
+  nix flake metadata
+
+############################################################################
+###  System information and history
+############################################################################
+
 # List all generations of the system profile
-[group('nix')]
+[group('info')]
 history:
-  nix profile history --profile /nix/var/nix/profiles/system
+  #!/usr/bin/env bash
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    nix profile history --profile /nix/var/nix/profiles/system
+  else
+    sudo nix profile history --profile /nix/var/nix/profiles/system
+  fi
 
-# Open a nix shell with the flake
-[group('nix')]
-repl:
-  nix repl -f flake:nixpkgs
+# Show current system configuration path
+[group('info')]
+current:
+  #!/usr/bin/env bash
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    ls -la /nix/var/nix/profiles/system
+  else
+    sudo ls -la /nix/var/nix/profiles/system
+  fi
 
-# remove all generations older than 7 days
-# on darwin, you may need to switch to root user to run this command
-[group('nix')]
+# Show disk usage of nix store
+[group('info')]
+store-size:
+  du -sh /nix/store
+
+############################################################################
+###  Garbage collection and cleanup
+############################################################################
+
+# Remove all generations older than 7 days
+[group('cleanup')]
 clean:
-  sudo nix profile wipe-history --profile /nix/var/nix/profiles/system  --older-than 7d
+  #!/usr/bin/env bash
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
+  else
+    sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 7d
+  fi
 
 # Garbage collect all unused nix store entries
-[group('nix')]
+[group('cleanup')]
 gc:
-  # garbage collect all unused nix store entries(system-wide)
+  # Garbage collect system-wide
   sudo nix-collect-garbage --delete-older-than 7d
-  # garbage collect all unused nix store entries(for the user - home-manager)
-  # https://github.com/NixOS/nix/issues/8508
+  # Garbage collect user profile (home-manager)
   nix-collect-garbage --delete-older-than 7d
 
-[group('nix')]
-fmt:
-  # format the nix files in this repo
-  nix fmt
+# Optimize nix store (deduplicate identical files)
+[group('cleanup')]
+optimize:
+  sudo nix-store --optimize
 
-# Show all the auto gc roots in the nix store
-[group('nix')]
+# Show all auto gc roots in the nix store
+[group('cleanup')]
 gcroot:
   ls -al /nix/var/nix/gcroots/auto/
+
+############################################################################
+###  Host management
+############################################################################
+
+# List all available hosts
+[group('hosts')]
+hosts:
+  @echo "Available Darwin hosts:"
+  @ls -1 hosts/ | grep -v example
+  @echo "\nExample configurations:"
+  @ls -1 hosts/ | grep example
+
+# Create a new host configuration (usage: just new-host myserver)
+[group('hosts')]
+new-host hostname:
+  #!/usr/bin/env bash
+  if [ -d "hosts/{{hostname}}" ]; then
+    echo "Host {{hostname}} already exists!"
+    exit 1
+  fi
+
+  echo "Creating new host configuration for {{hostname}}..."
+  mkdir -p "hosts/{{hostname}}"
+
+  # Choose template based on user input
+  echo "Select host type:"
+  echo "1) Darwin (macOS)"
+  echo "2) NixOS (Linux)"
+  read -p "Enter choice (1 or 2): " choice
+
+  case $choice in
+    1)
+      cp "hosts/mbp/default.nix" "hosts/{{hostname}}/default.nix"
+      sed -i '' 's/MacBook Pro/{{hostname}}/g' "hosts/{{hostname}}/default.nix"
+      echo "Created Darwin host configuration for {{hostname}}"
+      echo "Add to flake.nix darwinConfigurations section:"
+      echo "  (mkSystem { hostname = \"{{hostname}}\"; system = \"aarch64-darwin\"; })"
+      ;;
+    2)
+      cp "hosts/example-server/default.nix" "hosts/{{hostname}}/default.nix"
+      echo "Created NixOS host configuration for {{hostname}}"
+      echo "Add to flake.nix nixosConfigurations section:"
+      echo "  (mkSystem { hostname = \"{{hostname}}\"; system = \"x86_64-linux\"; })"
+      ;;
+    *)
+      echo "Invalid choice"
+      rm -rf "hosts/{{hostname}}"
+      exit 1
+      ;;
+  esac
 
