@@ -13,7 +13,7 @@ casks = [
     'balenaetcher',
     'music-decoy',
     'prefs-editor',
-    'logi-options+'
+    'logi-options+',
 
     # CLI Tools
     'warp',
@@ -72,7 +72,7 @@ casks = [
     'virtualbuddy',
 
     # Productivity
-    'notion'
+    'notion',
 
     # Gaming
     'steam',

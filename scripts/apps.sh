@@ -20,4 +20,4 @@ install_applications() {
 # Run installation if script is executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     install_applications
-fi 
+fi
