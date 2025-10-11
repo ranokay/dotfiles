@@ -10,10 +10,10 @@ check_default() {
     local key="$2"
     local expected_value="$3"
     local value_type="$4"  # bool, int, float, string
-    
+
     local current_value
     current_value=$(defaults read "$domain" "$key" 2>/dev/null)
-    
+
     # Handle different value types for comparison
     case "$value_type" in
         "bool")
@@ -28,7 +28,7 @@ check_default() {
             # String comparison (default)
             ;;
     esac
-    
+
     if [[ "$current_value" == "$expected_value" ]]; then
         return 0  # Value matches
     else
@@ -42,7 +42,7 @@ set_default() {
     local value="$3"
     local value_type="$4"
     local description="$5"
-    
+
     if ! check_default "$domain" "$key" "$value" "$value_type"; then
         if [[ "$DRY_RUN" == "true" ]]; then
             print_dry_run "Would update $description (${domain} ${key} = ${value})"
@@ -50,7 +50,7 @@ set_default() {
             # Store current value for rollback
             local current_value
             current_value=$(defaults read "$domain" "$key" 2>/dev/null || echo "NOT_SET")
-            
+
             # Create rollback command
             local rollback_cmd
             if [[ "$current_value" == "NOT_SET" ]]; then
@@ -68,15 +68,15 @@ set_default() {
                 fi
                 rollback_cmd="defaults write '$domain' '$key' -$current_type '$current_value'"
             fi
-            
+
             add_to_rollback "defaults" "$description" "$rollback_cmd"
-            
+
             # Apply the change
             if ! defaults write "$domain" "$key" -"$value_type" "$value" 2>/dev/null; then
                 handle_error 1 "Failed to update $description" "true"
                 return 1
             fi
-            
+
             print_success "Updated $description"
         fi
     fi
@@ -86,7 +86,7 @@ set_default() {
 check_system_config() {
     local config_type="$1"
     local expected_value="$2"
-    
+
     local current_value
     case "$config_type" in
         "ComputerName")
@@ -99,7 +99,7 @@ check_system_config() {
             current_value=$(sudo scutil --get LocalHostName 2>/dev/null)
             ;;
     esac
-    
+
     if [[ "$current_value" == "$expected_value" ]]; then
         return 0
     else
@@ -111,7 +111,7 @@ set_system_config() {
     local config_type="$1"
     local value="$2"
     local description="$3"
-    
+
     if ! check_system_config "$config_type" "$value"; then
         if [[ "$DRY_RUN" == "true" ]]; then
             print_dry_run "Would update $description ($config_type = $value)"
@@ -125,7 +125,7 @@ set_system_config() {
 # Wrap configurations in functions for better organization
 configure_general() {
     print_info "Configuring general UI/UX settings..."
-    
+
     # Set computer name (as done via System Preferences → Sharing)
     set_system_config "ComputerName" "mbp" "Computer name"
     set_system_config "HostName" "mbp" "Host name"
@@ -160,11 +160,13 @@ configure_general() {
 
     # Remove margins from tiled windows
     set_default "com.apple.WindowManager" "EnableTiledWindowMargins" "false" "bool" "tiled window margins"
+
+    print_success "General UI/UX configuration completed"
 }
 
 configure_input() {
     print_info "Configuring input devices..."
-    
+
     # Trackpad: enable tap to click for this user and for the login screen
     set_default "com.apple.AppleMultitouchTrackpad" "Clicking" "true" "bool" "trackpad tap to click"
     set_default "com.apple.driver.AppleBluetoothMultitouch.trackpad" "Clicking" "true" "bool" "bluetooth trackpad tap to click"
@@ -181,6 +183,8 @@ configure_input() {
 
     # Configure Music Decoy to launch another app when the Play button is pressed
     set_default "com.apple.MusicDecoy" "mediaAppPath" "/Applications/Spotify.app" "string" "Music Decoy media app path"
+
+    print_success "Input device configuration completed"
 }
 
 ###############################################################################
@@ -189,7 +193,7 @@ configure_input() {
 
 configure_screen() {
     print_info "Configuring screen settings..."
-    
+
     # Require password immediately after sleep or screen saver begins
     set_default "com.apple.screensaver" "askForPassword" "1" "int" "password required after screensaver"
     set_default "com.apple.screensaver" "askForPasswordDelay" "0" "int" "password delay after screensaver"
@@ -202,6 +206,8 @@ configure_screen() {
 
     # Disable shadow in screenshots
     set_default "com.apple.screencapture" "disable-shadow" "true" "bool" "screenshot shadow"
+
+    print_success "Screen configuration completed"
 }
 
 ###############################################################################
@@ -210,7 +216,7 @@ configure_screen() {
 
 configure_finder() {
     print_info "Configuring Finder settings..."
-    
+
     # Finder: disable window animations and Get Info animations
     set_default "com.apple.finder" "DisableAllAnimations" "true" "bool" "Finder animations"
 
@@ -276,6 +282,8 @@ configure_finder() {
         General -bool true \
         OpenWith -bool true \
         Privileges -bool true 2>/dev/null || true
+
+    print_success "Finder configuration completed"
 }
 
 ###############################################################################
@@ -284,7 +292,7 @@ configure_finder() {
 
 configure_dock() {
     print_info "Configuring Dock settings..."
-    
+
     # Automatically hide and show the Dock
     set_default "com.apple.dock" "autohide" "true" "bool" "Dock autohide"
     # Remove the auto-hiding Dock delay
@@ -369,6 +377,8 @@ configure_dock() {
     # Bottom right screen corner → Application Windows
     set_default "com.apple.dock" "wvous-br-corner" "2" "int" "bottom-right hot corner"
     set_default "com.apple.dock" "wvous-br-modifier" "0" "int" "bottom-right hot corner modifier"
+
+    print_success "Dock and hot corners configuration completed"
 }
 
 ###############################################################################
@@ -377,9 +387,11 @@ configure_dock() {
 
 configure_time_machine() {
     print_info "Configuring Time Machine settings..."
-    
+
     # Prevent Time Machine from prompting to use new hard drives as backup volume
     set_default "com.apple.TimeMachine" "DoNotOfferNewDisksForBackup" "true" "bool" "Time Machine new disk prompts"
+
+    print_success "Time Machine configuration completed"
 }
 
 ###############################################################################
@@ -388,7 +400,7 @@ configure_time_machine() {
 
 configure_activity_monitor() {
     print_info "Configuring Activity Monitor settings..."
-    
+
     # Show the main window when launching Activity Monitor
     set_default "com.apple.ActivityMonitor" "OpenMainWindow" "true" "bool" "Activity Monitor main window"
 
@@ -398,6 +410,8 @@ configure_activity_monitor() {
     # Sort Activity Monitor results by CPU usage
     set_default "com.apple.ActivityMonitor" "SortColumn" "CPUUsage" "string" "Activity Monitor sort column"
     set_default "com.apple.ActivityMonitor" "SortDirection" "0" "int" "Activity Monitor sort direction"
+
+    print_success "Activity Monitor configuration completed"
 }
 
 ###############################################################################
@@ -406,19 +420,23 @@ configure_activity_monitor() {
 
 configure_textedit() {
     print_info "Configuring TextEdit settings..."
-    
+
     # Use plain text mode for new TextEdit documents
     set_default "com.apple.TextEdit" "RichText" "0" "int" "TextEdit rich text mode"
     # Open and save files as UTF-8 in TextEdit
     set_default "com.apple.TextEdit" "PlainTextEncoding" "4" "int" "TextEdit plain text encoding"
     set_default "com.apple.TextEdit" "PlainTextEncodingForWrite" "4" "int" "TextEdit write encoding"
+
+    print_success "TextEdit configuration completed"
 }
 
 configure_quicktime() {
     print_info "Configuring QuickTime Player settings..."
-    
+
     # Auto-play videos when opened with QuickTime Player
     set_default "com.apple.QuickTimePlayerX" "MGPlayMovieOnOpen" "true" "bool" "QuickTime auto-play"
+
+    print_success "QuickTime configuration completed"
 }
 
 ###############################################################################
@@ -427,7 +445,7 @@ configure_quicktime() {
 
 configure_photos() {
     print_info "Configuring Photos settings..."
-    
+
     # Prevent Photos from opening automatically when devices are plugged in
     # Note: -currentHost requires special handling
     local current_value
@@ -436,6 +454,8 @@ configure_photos() {
         defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
         print_success "Updated Photos auto-launch prevention"
     fi
+
+    print_success "Photos configuration completed"
 }
 
 # Main configuration function
@@ -445,7 +465,7 @@ apply_macos_configuration() {
 
     # Ask for administrator password
     sudo -v
-    
+
     # Keep-alive sudo until script is finished
     while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
@@ -464,7 +484,7 @@ apply_macos_configuration() {
     # Kill affected applications only if we're not about to restart
     if ! ask_confirmation "Would you like to restart your computer now?"; then
         print_info "Restarting affected applications..."
-        
+
         local affected_apps=(
             "Activity Monitor"
             "Address Book"
@@ -485,7 +505,7 @@ apply_macos_configuration() {
         for app in "${affected_apps[@]}"; do
             killall "${app}" &>/dev/null || true
         done
-        
+
         print_success "Applications restarted"
         print_info "Note: Some changes may not take effect until you log out/restart"
     else

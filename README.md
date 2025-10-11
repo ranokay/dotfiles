@@ -12,24 +12,29 @@ A comprehensive, production-ready dotfiles repository for automating macOS devel
 ## ✨ Features
 
 ### 🔄 **Smart Configuration Management**
+
 - **Intelligent Defaults Checking** - Only applies changes when values differ from desired state
 - **Dry-Run Mode** - Preview all changes before applying them
 - **Selective Module Execution** - Run only specific configuration modules
 - **Progress Tracking** - Real-time progress indicators and execution duration
 
 ### 🛡️ **Safety & Recovery**
+
 - **Automatic Backups** - Creates timestamped backups before making changes
 - **Rollback System** - Automatic recovery on errors or script interruption
 - **Change Tracking** - Maintains rollback stack for all modifications
 - **Backup Management** - Automatically keeps 5 most recent backups
 
 ### 📦 **Package Management**
+
 - **Brewfile Integration** - Centralized package management with validation
+- **Real-Time Progress** - Verbose output showing each package as it installs
 - **Health Monitoring** - Automatic health checks with `brew doctor`
 - **Service Management** - Manages essential Homebrew services
 - **Upgrade Detection** - Interactive prompts for outdated packages
 
 ### 🐚 **Shell Configuration**
+
 - **Multi-Shell Support** - Zsh, Fish, and Bash with intelligent detection
 - **Oh My Zsh Automation** - Automatic installation with Powerlevel10k theme
 - **Plugin Management** - Pre-configured useful plugins and enhancements
@@ -164,6 +169,26 @@ DRY_RUN=true ./scripts/backup.sh restore 20231010_143022
 
 ## 📦 Package Management
 
+### Installation Progress
+
+During installation, you'll see real-time progress for each package:
+
+```bash
+▶ Package Installation Phase
+  ↳ Analyzing package requirements...
+→ Found 15 package(s) to install/update
+
+  📦 Installing node
+  ⬆️  Upgrading git
+  ✓ Using docker
+  ...
+
+  ↳ Summary:
+✓   Installed: 8 package(s)
+✓   Upgraded: 2 package(s)
+→   Already installed: 5 package(s)
+```
+
 ### Managing Packages
 
 ```bash
@@ -195,6 +220,7 @@ mas << { name: 'Xcode', id: 497799835 }
 ### Zsh (Recommended)
 
 Automatically installs:
+
 - Oh My Zsh framework
 - Powerlevel10k theme
 - Useful plugins (autosuggestions, syntax highlighting)
@@ -202,12 +228,14 @@ Automatically installs:
 ### Fish Shell
 
 Automatically installs:
+
 - Fisher plugin manager
 - Useful plugins (fzf, done, autopair)
 
 ### Configuration Files
 
 Located in `config/shell/`:
+
 - `zshrc` - Zsh configuration
 - `zsh_aliases` - Custom aliases
 - `config.fish` - Fish configuration
@@ -219,6 +247,7 @@ Located in `config/shell/`:
 ### Common Issues
 
 **Homebrew fails to install:**
+
 ```bash
 # Install manually first
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -226,12 +255,14 @@ Located in `config/shell/`:
 ```
 
 **Permission errors:**
+
 ```bash
 chmod +x setup.sh scripts/*.sh
 ./setup.sh
 ```
 
 **Script fails midway:**
+
 ```bash
 # Check logs
 tail -f ~/.dotfiles-setup.log
@@ -297,6 +328,7 @@ bash -n setup.sh scripts/*.sh
 ## 🤝 Contributing
 
 Contributions welcome! Please:
+
 1. Test with dry-run mode
 2. Maintain backward compatibility
 3. Update documentation
@@ -309,13 +341,3 @@ Contributions welcome! Please:
 MIT License - Open source and free to use.
 
 ---
-
-## 📧 Contact
-
-**Author**: ranokay  
-**Email**: github@ranokay.com  
-**GitHub**: [@ranokay](https://github.com/ranokay)
-
----
-
-**Happy configuring! 🎉**

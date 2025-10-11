@@ -68,7 +68,7 @@ print_substep() {
 print_result() {
     local status="$1"
     local message="$2"
-    
+
     case "$status" in
         "success")
             print_success "$message"
@@ -106,7 +106,7 @@ add_to_rollback() {
     local action_type="$1"
     local description="$2"
     local rollback_command="$3"
-    
+
     ROLLBACK_STACK+=("$action_type|$description|$rollback_command")
     log_message "ROLLBACK" "Added to rollback stack: $description"
 }
@@ -117,9 +117,9 @@ execute_rollback() {
         print_info "No actions to rollback"
         return 0
     fi
-    
+
     print_error "Executing rollback of ${#ROLLBACK_STACK[@]} actions..."
-    
+
     # Rollback in reverse order
     for ((i=${#ROLLBACK_STACK[@]}-1; i>=0; i--)); do
         local entry="${ROLLBACK_STACK[i]}"
@@ -127,9 +127,9 @@ execute_rollback() {
         local temp="${entry#*|}"
         local description="${temp%%|*}"
         local rollback_command="${temp#*|}"
-        
+
         print_info "Rolling back: $description"
-        
+
         case "$action_type" in
             "defaults")
                 eval "$rollback_command" 2>/dev/null || print_error "Failed to rollback: $description"
@@ -142,7 +142,7 @@ execute_rollback() {
                 ;;
         esac
     done
-    
+
     print_success "Rollback completed"
 }
 
@@ -151,20 +151,20 @@ handle_error() {
     local exit_code="$1"
     local error_message="$2"
     local allow_continue="${3:-false}"
-    
+
     ((ERROR_COUNT++))
     print_error "$error_message (Exit code: $exit_code)"
     log_message "ERROR" "$error_message (Exit code: $exit_code)"
-    
+
     if [[ "$allow_continue" != "true" ]]; then
         print_error "Critical error encountered. Initiating rollback..."
         execute_rollback
-        
+
         if [[ -n "$AUTO_BACKUP_DIR" ]]; then
             print_info "Automatic backup available at: $AUTO_BACKUP_DIR"
             print_info "To restore: ./scripts/backup.sh restore $(basename "$AUTO_BACKUP_DIR")"
         fi
-        
+
         exit "$exit_code"
     fi
 }
@@ -197,21 +197,21 @@ show_summary() {
     local duration=$((end_time - START_TIME))
     local minutes=$((duration / 60))
     local seconds=$((duration % 60))
-    
+
     if [[ $ERROR_COUNT -gt 0 ]]; then
         printf "\n${YELLOW}Setup completed with ${ERROR_COUNT} error(s) in ${minutes}m ${seconds}s${NC}\n"
     else
         printf "\n${GREEN}Setup completed successfully in ${minutes}m ${seconds}s${NC}\n"
     fi
-    
+
     printf "${YELLOW}Log file: %s${NC}\n" "$LOG_FILE"
-    
+
     if [[ ${#ROLLBACK_STACK[@]} -gt 0 ]]; then
         printf "${BLUE}Rollback stack: ${#ROLLBACK_STACK[@]} actions available${NC}\n"
     fi
-    
+
     log_message "SUMMARY" "Setup completed with $ERROR_COUNT errors in ${minutes}m ${seconds}s"
-    
+
     # Mark as clean exit
     mark_clean_exit
 }
@@ -225,11 +225,11 @@ command_exists() {
 ask_confirmation() {
     read -r -p "$1 [y/N] " response
     case "$response" in
-        [yY][eE][sS]|[yY]) 
+        [yY][eE][sS]|[yY])
             true
             ;;
         *)
             false
             ;;
     esac
-} 
+}

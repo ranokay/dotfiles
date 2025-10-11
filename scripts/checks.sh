@@ -23,7 +23,7 @@ check_xcode() {
     if ! xcode-select -p &>/dev/null; then
         print_info "Installing Xcode Command Line Tools..."
         xcode-select --install
-        
+
         # Wait for installation to complete
         until xcode-select -p &>/dev/null; do
             sleep 5
@@ -31,4 +31,4 @@ check_xcode() {
     fi
 
     print_success "Xcode Command Line Tools installed"
-} 
+}

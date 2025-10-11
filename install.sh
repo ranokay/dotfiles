@@ -24,4 +24,4 @@ install_applications
 source "./scripts/macos.sh"
 apply_macos_configuration
 
-print_success "Initial setup completed successfully!" 
+print_success "Initial setup completed successfully!"

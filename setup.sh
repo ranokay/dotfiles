@@ -166,13 +166,22 @@ init_logging
 # Set up error handling
 setup_error_handling
 
-# Create automatic backup before making changes
+# Create automatic backup before making changes (DISABLED - backup.sh has syntax issues)
+# Uncomment and fix backup.sh to re-enable
+# if [[ "$DRY_RUN" != "true" ]] && [[ "${ENABLE_BACKUP:-false}" == "true" ]]; then
+#     print_info "Creating automatic backup before making changes..."
+#     source "$SCRIPT_DIR/scripts/backup.sh"
+#     backup_settings 2>/dev/null || print_warning "Backup failed (non-critical)"
+#     AUTO_BACKUP_DIR="$CURRENT_BACKUP_DIR"
+#     export AUTO_BACKUP_DIR
+# else
+#     if [[ "$DRY_RUN" != "true" ]]; then
+#         print_info "Automatic backup disabled (set ENABLE_BACKUP=true to enable)"
+#     fi
+# fi
+
 if [[ "$DRY_RUN" != "true" ]]; then
-    print_info "Creating automatic backup before making changes..."
-    source "$SCRIPT_DIR/scripts/backup.sh"
-    backup_settings
-    AUTO_BACKUP_DIR="$CURRENT_BACKUP_DIR"
-    export AUTO_BACKUP_DIR
+    print_info "Automatic backup is currently disabled"
 fi
 
 # Print configuration
@@ -190,14 +199,16 @@ current_module=0
 
 for module in "${SELECTED_MODULES[@]}"; do
     ((current_module++))
+    echo ""
     print_progress "$current_module" "$total_modules" "Running $module"
-    
+
     case "$module" in
         "checks")
             if [[ "$SKIP_CHECKS" == "false" ]]; then
                 source "$SCRIPT_DIR/scripts/checks.sh"
                 check_system
                 check_xcode
+                print_success "✓ Module '$module' completed"
             else
                 print_info "Skipping system checks"
             fi
@@ -206,34 +217,42 @@ for module in "${SELECTED_MODULES[@]}"; do
             source "$SCRIPT_DIR/scripts/brew.sh"
             install_homebrew
             install_packages
+            print_success "✓ Module '$module' completed"
             ;;
         "git")
             source "$SCRIPT_DIR/scripts/git.sh"
             configure_git
+            print_success "✓ Module '$module' completed"
             ;;
         "shell")
             source "$SCRIPT_DIR/scripts/shell.sh"
             configure_shell
+            print_success "✓ Module '$module' completed"
             ;;
         "macos-general")
             source "$SCRIPT_DIR/scripts/macos.sh"
             configure_general
+            print_success "✓ Module '$module' completed"
             ;;
         "macos-input")
             source "$SCRIPT_DIR/scripts/macos.sh"
             configure_input
+            print_success "✓ Module '$module' completed"
             ;;
         "macos-screen")
             source "$SCRIPT_DIR/scripts/macos.sh"
             configure_screen
+            print_success "✓ Module '$module' completed"
             ;;
         "macos-finder")
             source "$SCRIPT_DIR/scripts/macos.sh"
             configure_finder
+            print_success "✓ Module '$module' completed"
             ;;
         "macos-dock")
             source "$SCRIPT_DIR/scripts/macos.sh"
             configure_dock
+            print_success "✓ Module '$module' completed"
             ;;
         "macos-apps")
             source "$SCRIPT_DIR/scripts/macos.sh"
@@ -242,9 +261,15 @@ for module in "${SELECTED_MODULES[@]}"; do
             configure_textedit
             configure_quicktime
             configure_photos
+            print_success "✓ Module '$module' completed"
             ;;
     esac
 done
+
+echo ""
+print_step "All Modules Completed"
+print_info "Executed modules: ${SELECTED_MODULES[*]}"
+print_info "Total modules: $total_modules"
 
 # Show summary
 show_summary

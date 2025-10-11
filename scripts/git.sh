@@ -9,7 +9,7 @@ check_git_config() {
     local current_value
 
     current_value=$(git config --global --get "$key")
-    
+
     if [[ "$current_value" == "$expected_value" ]]; then
         return 0  # Config matches
     else
@@ -53,4 +53,4 @@ configure_git() {
     set_git_config "gpg.ssh.program" "$op_ssh_sign_path" "SSH signing program"
 
     print_success "Git configuration completed"
-} 
+}

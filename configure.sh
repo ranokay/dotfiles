@@ -18,4 +18,4 @@ check_system
 source "./scripts/macos.sh"
 apply_macos_configuration
 
-print_success "System configuration completed!" 
+print_success "System configuration completed!"
