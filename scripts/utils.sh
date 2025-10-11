@@ -2,6 +2,8 @@
 
 # Global configuration
 DRY_RUN=${DRY_RUN:-false}
+VERBOSE=${VERBOSE:-false}
+ASSUME_YES=${ASSUME_YES:-false}
 LOG_FILE="${HOME}/.dotfiles-setup.log"
 START_TIME=$(date +%s)
 
@@ -11,14 +13,25 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Logging function
+# Logging function with enhanced context
 log_message() {
     local level="$1"
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] [$level] $message" >> "$LOG_FILE"
+    local caller_info=""
+
+    # Capture caller information (function name and line number)
+    if [[ "${BASH_SOURCE[2]:-}" != "" ]]; then
+        local func="${FUNCNAME[2]:-main}"
+        local line="${BASH_LINENO[1]:-0}"
+        local file=$(basename "${BASH_SOURCE[2]}")
+        caller_info=" [$file:$func:$line]"
+    fi
+
+    echo "[$timestamp] [$level]$caller_info $message" >> "$LOG_FILE"
 }
 
 # Print with colors and logging
@@ -63,6 +76,20 @@ print_step() {
 print_substep() {
     printf "  ${BLUE}↳ %s${NC}\n" "$1"
     log_message "SUBSTEP" "$1"
+}
+
+print_debug() {
+    if [[ "$VERBOSE" == "true" ]]; then
+        printf "${CYAN}[DEBUG] %s${NC}\n" "$1"
+        log_message "DEBUG" "$1"
+    else
+        log_message "DEBUG" "$1"
+    fi
+}
+
+print_prompt() {
+    printf "${MAGENTA}? %s${NC} " "$1"
+    log_message "PROMPT" "$1"
 }
 
 print_result() {
@@ -146,15 +173,28 @@ execute_rollback() {
     print_success "Rollback completed"
 }
 
-# Enhanced error handling
+# Enhanced error handling with stack trace and recovery suggestions
 handle_error() {
     local exit_code="$1"
     local error_message="$2"
     local allow_continue="${3:-false}"
+    local recovery_hint="${4:-}"
 
     ((ERROR_COUNT++))
     print_error "$error_message (Exit code: $exit_code)"
     log_message "ERROR" "$error_message (Exit code: $exit_code)"
+
+    # Capture and log stack trace
+    local frame=0
+    log_message "ERROR" "Stack trace:"
+    while caller $frame >> "$LOG_FILE" 2>&1; do
+        ((frame++))
+    done
+
+    # Show recovery suggestion if provided
+    if [[ -n "$recovery_hint" ]]; then
+        print_info "💡 Suggestion: $recovery_hint"
+    fi
 
     if [[ "$allow_continue" != "true" ]]; then
         print_error "Critical error encountered. Initiating rollback..."
@@ -166,6 +206,18 @@ handle_error() {
         fi
 
         exit "$exit_code"
+    fi
+}
+
+# Handle warnings (non-critical issues)
+handle_warning() {
+    local warning_message="$1"
+    local suggestion="${2:-}"
+
+    print_warning "$warning_message"
+
+    if [[ -n "$suggestion" ]]; then
+        print_info "💡 Suggestion: $suggestion"
     fi
 }
 
@@ -232,4 +284,45 @@ ask_confirmation() {
             false
             ;;
     esac
+}
+
+# Prompt with default value (smart defaults)
+prompt_with_default() {
+    local prompt="$1"
+    local default="$2"  # 'y' or 'n'
+    local response
+
+    # Skip prompt if --yes flag is set
+    if [[ "$ASSUME_YES" == "true" ]]; then
+        print_debug "Auto-answering prompt with default: $default"
+        [[ "$default" == "y" ]] && return 0 || return 1
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        print_dry_run "Would prompt: $prompt [default: $default]"
+        return 0
+    fi
+
+    print_prompt "$prompt [$([ "$default" = "y" ] && echo "Y/n" || echo "y/N")]"
+    read -r response
+    response=${response:-$default}
+
+    case "$response" in
+        [yY][eE][sS]|[yY]) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# Print operation summary
+print_summary() {
+    local operation="$1"
+    shift
+    local -a stats=("$@")
+
+    echo ""
+    print_step "Summary: $operation"
+    for stat in "${stats[@]}"; do
+        print_info "  $stat"
+    done
+    echo ""
 }

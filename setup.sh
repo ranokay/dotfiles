@@ -1,8 +1,29 @@
 #!/usr/bin/env bash
 
 # Enhanced dotfiles setup script with selective configuration support
+# Requires Bash 4+ for modern features
 
 set -eo pipefail  # Remove -u flag to avoid issues with associative arrays
+
+# Check Bash version
+if [[ ${BASH_VERSION%%.*} -lt 4 ]]; then
+    echo "⚠️  WARNING: This script works best with Bash 4+, currently running Bash $BASH_VERSION"
+    echo "The script will continue with system Bash, but modern Bash features will be limited."
+    echo ""
+    echo "After Homebrew installation completes, you can switch to modern Bash:"
+    if [[ "$(uname -m)" == "arm64" ]]; then
+        echo "  echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells"
+        echo "  chsh -s /opt/homebrew/bin/bash"
+    else
+        echo "  echo '/usr/local/bin/bash' | sudo tee -a /etc/shells"
+        echo "  chsh -s /usr/local/bin/bash"
+    fi
+    echo ""
+    echo "Then restart your terminal and re-run this script for optimal experience."
+    echo ""
+    read -p "Press Enter to continue with system Bash, or Ctrl+C to exit..."
+    echo ""
+fi
 
 # Source utility functions
 source "$(dirname "${BASH_SOURCE[0]}")/scripts/utils.sh"
@@ -24,6 +45,7 @@ OPTIONS:
     -l, --list          List available configuration modules
     -a, --all           Run all configuration modules (default)
     -v, --verbose       Enable verbose output
+    -y, --yes           Assume yes to all prompts (non-interactive mode)
     --skip-checks       Skip system requirement checks
     --log-file FILE     Custom log file location
 
@@ -113,6 +135,12 @@ while [[ $# -gt 0 ]]; do
             ;;
         -v|--verbose)
             VERBOSE=true
+            export VERBOSE
+            shift
+            ;;
+        -y|--yes)
+            ASSUME_YES=true
+            export ASSUME_YES
             shift
             ;;
         --skip-checks)
@@ -166,22 +194,19 @@ init_logging
 # Set up error handling
 setup_error_handling
 
-# Create automatic backup before making changes (DISABLED - backup.sh has syntax issues)
-# Uncomment and fix backup.sh to re-enable
-# if [[ "$DRY_RUN" != "true" ]] && [[ "${ENABLE_BACKUP:-false}" == "true" ]]; then
-#     print_info "Creating automatic backup before making changes..."
-#     source "$SCRIPT_DIR/scripts/backup.sh"
-#     backup_settings 2>/dev/null || print_warning "Backup failed (non-critical)"
-#     AUTO_BACKUP_DIR="$CURRENT_BACKUP_DIR"
-#     export AUTO_BACKUP_DIR
-# else
-#     if [[ "$DRY_RUN" != "true" ]]; then
-#         print_info "Automatic backup disabled (set ENABLE_BACKUP=true to enable)"
-#     fi
-# fi
-
-if [[ "$DRY_RUN" != "true" ]]; then
-    print_info "Automatic backup is currently disabled"
+# Create automatic backup before making changes
+if [[ "$DRY_RUN" != "true" ]] && [[ "${ENABLE_BACKUP:-true}" == "true" ]]; then
+    print_info "Creating automatic backup before making changes..."
+    source "$SCRIPT_DIR/scripts/backup.sh"
+    if backup_settings 2>&1 | tee -a "$LOG_FILE"; then
+        AUTO_BACKUP_DIR="$CURRENT_BACKUP_DIR"
+        export AUTO_BACKUP_DIR
+        print_success "Backup created: $AUTO_BACKUP_DIR"
+    else
+        handle_warning "Backup failed (non-critical)" "You can continue, but no rollback will be available"
+    fi
+elif [[ "$DRY_RUN" != "true" ]]; then
+    print_info "Automatic backup disabled (set ENABLE_BACKUP=false to disable)"
 fi
 
 # Print configuration
@@ -197,8 +222,18 @@ fi
 total_modules=${#SELECTED_MODULES[@]}
 current_module=0
 
+# Pre-source macos.sh if any macOS modules are selected
+MACOS_SOURCED=false
 for module in "${SELECTED_MODULES[@]}"; do
-    ((current_module++))
+    if [[ "$module" == macos-* ]]; then
+        source "$SCRIPT_DIR/scripts/macos.sh"
+        MACOS_SOURCED=true
+        break
+    fi
+done
+
+for module in "${SELECTED_MODULES[@]}"; do
+    current_module=$((current_module + 1))
     echo ""
     print_progress "$current_module" "$total_modules" "Running $module"
 
@@ -230,32 +265,26 @@ for module in "${SELECTED_MODULES[@]}"; do
             print_success "✓ Module '$module' completed"
             ;;
         "macos-general")
-            source "$SCRIPT_DIR/scripts/macos.sh"
             configure_general
             print_success "✓ Module '$module' completed"
             ;;
         "macos-input")
-            source "$SCRIPT_DIR/scripts/macos.sh"
             configure_input
             print_success "✓ Module '$module' completed"
             ;;
         "macos-screen")
-            source "$SCRIPT_DIR/scripts/macos.sh"
             configure_screen
             print_success "✓ Module '$module' completed"
             ;;
         "macos-finder")
-            source "$SCRIPT_DIR/scripts/macos.sh"
             configure_finder
             print_success "✓ Module '$module' completed"
             ;;
         "macos-dock")
-            source "$SCRIPT_DIR/scripts/macos.sh"
             configure_dock
             print_success "✓ Module '$module' completed"
             ;;
         "macos-apps")
-            source "$SCRIPT_DIR/scripts/macos.sh"
             configure_time_machine
             configure_activity_monitor
             configure_textedit

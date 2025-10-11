@@ -1,6 +1,6 @@
 # 🚀 Dotfiles - macOS Development Environment Setup
 
-> **Version 2.0** - Enterprise-grade dotfiles management with automated backup, rollback, and modular configuration.
+> **Version 3.0** - Modern dotfiles management with interactive package management, smart defaults, and comprehensive error handling.
 
 A comprehensive, production-ready dotfiles repository for automating macOS development environment setup. Features include intelligent defaults checking, dry-run mode, automatic backups, rollback capabilities, and shell configuration management.
 
@@ -28,10 +28,18 @@ A comprehensive, production-ready dotfiles repository for automating macOS devel
 ### 📦 **Package Management**
 
 - **Brewfile Integration** - Centralized package management with validation
+- **Interactive Cleanup** - Selective add/remove for orphaned packages
 - **Real-Time Progress** - Verbose output showing each package as it installs
 - **Health Monitoring** - Automatic health checks with `brew doctor`
 - **Service Management** - Manages essential Homebrew services
 - **Upgrade Detection** - Interactive prompts for outdated packages
+
+### 🎯 **Smart Interactions**
+
+- **Interactive Mode** - Selective package management with numbered choices
+- **Non-Interactive Mode** - `--yes` flag for automation and CI/CD
+- **Smart Prompts** - Only prompts for critical/destructive actions
+- **Helpful Recovery** - Error messages include recovery suggestions
 
 ### 🐚 **Shell Configuration**
 
@@ -49,14 +57,42 @@ A comprehensive, production-ready dotfiles repository for automating macOS devel
 - **macOS 12.0+** (Monterey or later)
 - **Terminal** with internet connection
 - **Administrator access** for system configuration
+- **Bash 4.0+** will be installed automatically via Homebrew (required for modern features)
 
-### Installation
+### Fresh macOS Installation
+
+For a brand new Mac, run the full setup:
 
 ```bash
-# Clone and run setup
+# Clone the repository
 git clone https://github.com/ranokay/dotfiles.git ~/dotfiles
 cd ~/dotfiles
+
+# Run full setup (installs Xcode CLI tools, Homebrew, all packages, and configures macOS)
 ./setup.sh
+
+# After Homebrew installs modern Bash, switch to it (optional but recommended)
+# For Intel Macs:
+echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
+chsh -s /usr/local/bin/bash
+
+# For Apple Silicon Macs:
+echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells
+chsh -s /opt/homebrew/bin/bash
+
+# Restart terminal, then re-run with modern Bash for optimal experience
+./setup.sh
+```
+
+### Existing macOS Installation
+
+If you already have basic tools installed:
+
+```bash
+# Clone and run specific modules
+git clone https://github.com/ranokay/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+./setup.sh brew git shell
 ```
 
 ### First Steps After Setup
@@ -68,6 +104,7 @@ exec $SHELL
 # Verify installation
 brew list
 git config --list | grep user
+bash --version  # Should show 4.0 or higher
 ```
 
 ---
@@ -82,6 +119,12 @@ git config --list | grep user
 
 # Preview changes (dry-run)
 ./setup.sh --dry-run
+
+# Non-interactive mode (for automation)
+./setup.sh --yes
+
+# Verbose output with debug info
+./setup.sh --verbose
 
 # Show available modules
 ./setup.sh --list
@@ -109,14 +152,23 @@ git config --list | grep user
 ### Advanced Usage
 
 ```bash
-# Verbose logging
+# Verbose logging with debug output
 ./setup.sh --verbose
+
+# Non-interactive mode for CI/CD
+./setup.sh --yes
+
+# Disable automatic backup
+ENABLE_BACKUP=false ./setup.sh
 
 # Skip system checks
 ./setup.sh --skip-checks brew
 
 # Custom log file
 ./setup.sh --log-file ~/my-setup.log
+
+# Combine multiple options
+./setup.sh --verbose --yes brew git
 ```
 
 ---
@@ -142,11 +194,14 @@ git config --list | grep user
 
 ### Automatic Backups
 
-Backups are automatically created before any changes:
+Backups are automatically created before any changes (enabled by default):
 
 ```bash
 # Backups are stored in ~/.dotfiles-backup/
 ls -la ~/.dotfiles-backup/
+
+# Disable automatic backup if needed
+ENABLE_BACKUP=false ./setup.sh
 ```
 
 ### Manual Backup Operations
@@ -168,6 +223,36 @@ DRY_RUN=true ./scripts/backup.sh restore 20231010_143022
 ---
 
 ## 📦 Package Management
+
+### Interactive Package Cleanup
+
+When packages are found that aren't in your Brewfile, you'll get an interactive prompt:
+
+```bash
+⚠ Found 5 package(s) not defined in Brewfile
+
+→ Casks:
+   1) rectangle
+   2) spotify
+
+→ Formulae:
+   3) wget
+   4) jq
+   5) tree
+
+What would you like to do with these packages?
+  [a] Add selected to Brewfile
+  [u] Uninstall selected
+  [s] Skip/keep all packages
+
+? Enter your choice [a/u/s]: a
+? Enter package numbers to add (comma-separated, or 'all'): 1,3,5
+
+✓ Added cask: rectangle
+✓ Added formula: wget
+✓ Added formula: tree
+✓ Brewfile updated
+```
 
 ### Installation Progress
 
@@ -248,10 +333,21 @@ Located in `config/shell/`:
 
 **Homebrew fails to install:**
 
+The script will automatically retry 3 times with exponential backoff. If it still fails:
+
 ```bash
 # Install manually first
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ./setup.sh --skip-checks brew
+```
+
+**1Password SSH signing not working:**
+
+```bash
+# The script will detect this and prompt you
+# Option 1: Install 1Password from https://1password.com
+# Option 2: Continue without SSH signing (will prompt)
+# Option 3: Configure manually later
 ```
 
 **Permission errors:**
@@ -264,19 +360,33 @@ chmod +x setup.sh scripts/*.sh
 **Script fails midway:**
 
 ```bash
-# Check logs
+# Check logs with context
 tail -f ~/.dotfiles-setup.log
+
+# Look for recovery suggestions in error messages
+# The script now includes helpful hints for common issues
 
 # Restore from backup
 ./scripts/backup.sh list
 ./scripts/backup.sh restore <timestamp>
 ```
 
+**Interactive prompts in CI/CD:**
+
+```bash
+# Use non-interactive mode
+./setup.sh --yes
+
+# Or disable specific interactive features
+ENABLE_BACKUP=false ./setup.sh --yes
+```
+
 ### Getting Help
 
 - View logs: `cat ~/.dotfiles-setup.log`
+- Debug mode: `./setup.sh --verbose`
 - Test module: `./setup.sh --dry-run <module>`
-- Verbose mode: `./setup.sh --verbose`
+- Non-interactive test: `./setup.sh --dry-run --yes`
 
 ---
 
@@ -312,8 +422,14 @@ bash -n setup.sh scripts/*.sh
 # Dry-run test
 ./setup.sh --dry-run
 
-# Module test
+# Dry-run with verbose output
+./setup.sh --dry-run --verbose
+
+# Test specific module
 ./setup.sh --dry-run shell
+
+# Test non-interactive mode
+./setup.sh --dry-run --yes
 ```
 
 ### Adding Modules

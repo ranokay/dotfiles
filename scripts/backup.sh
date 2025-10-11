@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Requires Bash 4+ for associative arrays
+# Run with: /usr/local/bin/bash or /opt/homebrew/bin/bash
 
 # Backup and restore functionality for macOS defaults
 
@@ -8,8 +10,16 @@ BACKUP_DIR="${HOME}/.dotfiles-backup"
 BACKUP_TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 CURRENT_BACKUP_DIR="${BACKUP_DIR}/${BACKUP_TIMESTAMP}"
 
-# List of domains and keys to backup
-# Format: "domain::key" (using :: to avoid shell interpretation issues)
+# Check Bash version - need 4.0+ for associative arrays
+if [[ ${BASH_VERSION%%.*} -lt 4 ]]; then
+    print_warning "Backup requires Bash 4+, currently running Bash $BASH_VERSION"
+    print_info "Backup will be skipped on this run. After Homebrew installs Bash 4+, backups will work."
+    BACKUP_AVAILABLE=false
+else
+    BACKUP_AVAILABLE=true
+fi
+
+# List of domains and keys to backup (Bash 4+ associative arrays)
 declare -A BACKUP_SETTINGS=(
     # General settings
     ["NSGlobalDomain::NSUseAnimatedFocusRing"]="focus ring animation"
@@ -50,6 +60,12 @@ create_backup_dir() {
 
 # Backup current settings
 backup_settings() {
+    # Skip if Bash version too old
+    if [[ "$BACKUP_AVAILABLE" == "false" ]]; then
+        print_info "Skipping backup (Bash 4+ required)"
+        return 0
+    fi
+
     print_info "Creating backup of current settings..."
 
     create_backup_dir

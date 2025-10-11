@@ -5,6 +5,166 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2025-10-11
+
+### Breaking Changes
+
+- **Removed deprecated legacy scripts** - `install.sh`, `configure.sh`, and `scripts/apps.sh` have been removed
+- Use `./setup.sh` exclusively for all operations
+- All functionality previously in legacy scripts is available through `setup.sh` modules
+
+### Added
+
+#### 🎯 **Interactive Package Management**
+
+- **Selective Brewfile Management** - New interactive system for managing packages not in Brewfile
+  - Shows numbered list of orphaned packages (casks, formulae, taps)
+  - Options to add selected packages to Brewfile, uninstall them, or skip
+  - Supports comma-separated selections (e.g., "1,3,5") or "all"
+  - Automatically maintains proper Ruby syntax when adding to Brewfile
+  - Provides clear summary of actions taken
+
+#### 🛡️ **Enhanced Error Handling**
+
+- **Stack trace capture** on errors with detailed context logging
+- **Recovery suggestions** for common errors with actionable hints
+- **Retry logic** for Homebrew installation with exponential backoff (3 attempts)
+- **Validation checks** for 1Password before configuring Git SSH signing
+- **Git availability check** before cloning shell plugins
+- **Graceful degradation** for non-critical failures
+- `handle_warning()` function for non-critical issues
+
+#### 📊 **Improved Logging**
+
+- **Debug logging** with `print_debug()` (shown only in verbose mode)
+- **Enhanced log messages** with function names and line numbers
+- **Prompt logging** for better audit trail
+- **Color-coded prompts** for better visual distinction
+
+#### 🚦 **Smart Defaults**
+
+- **`--yes` / `-y` flag** for non-interactive automation mode
+- **`prompt_with_default()`** function for consistent prompting
+- **Critical action prompts**:
+  - System name changes (ComputerName, HostName, LocalHostName)
+  - Package uninstallation
+  - 1Password configuration when missing
+- **Automatic backup** re-enabled by default (can be disabled with `ENABLE_BACKUP=false`)
+
+#### 🔧 **System Improvements**
+
+- **Consistent sourcing patterns** across all scripts
+- **Optimized setup.sh** - macOS scripts sourced only once
+- **Better timeout handling** for `brew doctor` with detailed diagnostics
+
+### Changed
+
+#### 📦 **Package Management**
+
+- Brew package cleanup now uses interactive selection instead of bulk yes/no
+- Brewfile additions maintain proper formatting and indentation
+- Enhanced package installation error handling (continues on single package failure)
+- Improved cleanup warnings with actionable suggestions
+
+#### 🔐 **Git Configuration**
+
+- Validates 1Password installation before setting up SSH signing
+- Prompts user if 1Password not found with option to continue without it
+- Better error messages for missing dependencies
+
+#### 🐚 **Shell Configuration**
+
+- Git availability check before installing Oh My Zsh
+- Better error handling for plugin installation failures
+- Non-blocking failures for optional plugins
+
+#### ⚙️ **macOS Configuration**
+
+- System name changes now require confirmation
+- Better error handling for failed `scutil` operations
+- Administrator privilege checks with helpful error messages
+
+#### 📝 **Code Quality**
+
+- Removed unused revalidation constants from `constants.sh`
+- Standardized script sourcing to use `$(dirname "${BASH_SOURCE[0]}")`
+- Consolidated error handling logic
+- Improved code organization and readability
+
+### Changed - Bash 4+ Required
+
+- **Modern Bash syntax** - Now uses Bash 4+ associative arrays for cleaner code
+- **Bash installation** - Modern Bash (4.0+) automatically installed via Homebrew
+- **Bash version check** - Added check with instructions to switch to modern Bash
+- **Enhanced Brewfile** - Comprehensive package list for fresh macOS installations
+  - 100+ curated applications and tools
+  - Terminal: iTerm2, Warp
+  - Development: VS Code, Cursor, Zed, JetBrains Toolbox
+  - Languages: Node, Python, Go, Rust, Ruby, Lua
+  - CLI tools: fzf, ripgrep, bat, eza, zoxide, starship
+  - Databases: PostgreSQL, MySQL, Redis, SQLite
+  - Design: Figma, Sketch
+  - Productivity: Notion, Obsidian, Slack, Zoom
+  - And much more!
+
+### Fixed
+
+- ✅ **Backup system re-enabled** - Using Bash 4+ associative arrays, enabled by default
+- ✅ **Interactive package cleanup** - Requires Bash 4+ for associative arrays
+- ✅ **Git signing validation** - Properly checks for 1Password before configuration
+- ✅ **Shell plugin failures** - Non-critical plugin failures no longer stop setup
+- ✅ **brew doctor timeout** - Better handling with informative warnings
+- ✅ **Homebrew retry logic** - Installation now retries on failure with exponential backoff
+- ✅ **macOS sourcing** - Fixed redundant script sourcing in setup.sh
+
+### Improved
+
+- **User Experience**: Clear feedback for every operation with progress indicators
+- **Modern Bash**: Uses Bash 4+ features for cleaner, more maintainable code
+- **Fresh Install Ready**: Comprehensive Brewfile with 100+ apps for new Mac setup
+- **Error Recovery**: Helpful suggestions for common issues
+- **Documentation**: Inline code comments and function documentation
+- **Maintainability**: Consistent patterns and reduced code duplication
+
+### Migration Guide
+
+**From v2.x to v3.0:**
+
+1. **Remove references to legacy scripts** in any custom automation:
+
+   ```bash
+   # Old (no longer works)
+   ./install.sh
+   ./configure.sh
+
+   # New (use instead)
+   ./setup.sh
+   ./setup.sh macos-*
+   ```
+
+2. **Update any scripted usage** to use new flags:
+
+   ```bash
+   # For CI/CD or automated deployments
+   ./setup.sh --yes  # Skip all prompts
+
+   # For detailed debugging
+   ./setup.sh --verbose  # Show debug output
+   ```
+
+3. **Backup behavior changed**:
+   - Automatic backups now enabled by default
+   - To disable: `ENABLE_BACKUP=false ./setup.sh`
+   - Old backups in `~/.dotfiles-backup/` are still compatible
+
+4. **Bash 4+ now required**:
+   - Scripts use modern Bash 4+ associative arrays
+   - Bash 4+ automatically installed via Homebrew
+   - Switch default shell for optimal experience (see README)
+   - System Bash 3.2 will work initially but modern Bash recommended
+
+---
+
 ## [2.0.0] - 2023-10-10
 
 ### Added

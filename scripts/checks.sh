@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "./scripts/utils.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 check_system() {
     # Check if running on macOS

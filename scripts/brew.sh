@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# Requires Bash 4+ for associative arrays
+# Run with: /usr/local/bin/bash or /opt/homebrew/bin/bash
 
-source "./scripts/utils.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 # Validate Brewfile syntax and package availability
 validate_brewfile() {
@@ -45,15 +47,35 @@ install_homebrew() {
         # Add to rollback stack
         add_to_rollback "system" "Homebrew installation" "rm -rf /opt/homebrew || rm -rf /usr/local/Homebrew"
 
-        if ! /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
-            handle_error 1 "Failed to install Homebrew"
-            return 1
-        fi
+        # Retry logic with exponential backoff
+        local max_attempts=3
+        local attempt=1
+        local wait_time=5
+
+        while [[ $attempt -le $max_attempts ]]; do
+            print_debug "Homebrew installation attempt $attempt of $max_attempts"
+
+            if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+                break
+            else
+                if [[ $attempt -lt $max_attempts ]]; then
+                    print_warning "Homebrew installation failed (attempt $attempt/$max_attempts). Retrying in ${wait_time}s..."
+                    sleep $wait_time
+                    wait_time=$((wait_time * 2))
+                    ((attempt++))
+                else
+                    handle_error 1 "Failed to install Homebrew after $max_attempts attempts" "false" "Check your internet connection and try again, or install Homebrew manually"
+                    return 1
+                fi
+            fi
+        done
 
         # Add Homebrew to PATH for Apple Silicon Macs
         if [[ "$(uname -m)" == "arm64" ]]; then
             eval "$(/opt/homebrew/bin/brew shellenv)"
         fi
+
+        print_success "Homebrew installed successfully"
     fi
 
     # Update Homebrew and upgrade packages
@@ -89,13 +111,11 @@ update_homebrew() {
     else
         doctor_exit_code=$?
         if [[ $doctor_exit_code -eq 142 ]] || [[ $doctor_exit_code -eq 124 ]]; then
-            print_warning "Homebrew health check timed out (not critical)"
-            print_info "Run 'brew doctor' manually if you want to check for issues"
+            handle_warning "Homebrew health check timed out (not critical)" "Run 'brew doctor' manually to check for issues"
         elif [[ $doctor_exit_code -ne 0 ]]; then
             print_warning "Homebrew doctor found some issues:"
             echo "$doctor_output" | head -10 2>/dev/null || true
-            print_info "These issues may not be critical - continuing anyway"
-            print_info "Run 'brew doctor' manually to see full report"
+            handle_warning "Some non-critical Homebrew issues detected" "Run 'brew doctor' to see the full report and fix if needed"
         fi
     fi
 }
@@ -217,28 +237,13 @@ install_packages() {
 
     # Check if there are packages to clean up
     if [[ $cleanup_exit_code -eq 1 ]] && [[ -n "$cleanup_list" ]]; then
-        # Count packages to remove
-        local cask_count=$(echo "$cleanup_list" | grep -c "Would uninstall casks:" || echo "0")
-        local formula_count=$(echo "$cleanup_list" | grep -c "Would uninstall formulae:" || echo "0")
-        local tap_count=$(echo "$cleanup_list" | grep -c "Would untap:" || echo "0")
-
-        print_warning "Found packages not defined in Brewfile"
-        echo ""
-        printf "%s\n\n" "$cleanup_list"
-
         if [[ "$DRY_RUN" == "true" ]]; then
-            print_dry_run "Would prompt to remove these packages"
-            print_info "Re-run without --dry-run to clean up these packages"
-        elif ask_confirmation "\nDo you want to remove these packages?"; then
-            print_substep "Removing packages..."
-            if ! brew bundle cleanup --force --file="$brewfile" 2>&1; then
-                print_error "Failed to remove some packages"
-                exit 1
-            fi
-            print_success "Packages removed successfully"
+            print_dry_run "Would show interactive package cleanup"
+            printf "%s\n\n" "$cleanup_list"
+            print_info "Re-run without --dry-run to manage these packages interactively"
         else
-            print_info "Cleanup skipped - packages will remain installed"
-            print_info "You can clean them up later by running: brew bundle cleanup --force --file=$brewfile"
+            # Use interactive cleanup
+            interactive_cleanup_packages "$brewfile" "$cleanup_list"
         fi
     else
         print_success "No orphaned packages found - everything is in sync with Brewfile"
@@ -369,6 +374,226 @@ install_packages() {
     print_info "All packages are installed and configured"
 }
 
+# Parse packages from brew bundle cleanup output
+parse_cleanup_packages() {
+    local cleanup_output="$1"
+    local package_type="$2"  # "cask", "formula", or "tap"
+
+    local -a packages=()
+    local in_section=false
+
+    while IFS= read -r line; do
+        case "$package_type" in
+            "cask")
+                if [[ "$line" =~ "Would uninstall casks:" ]]; then
+                    in_section=true
+                    continue
+                fi
+                ;;
+            "formula")
+                if [[ "$line" =~ "Would uninstall formulae:" ]]; then
+                    in_section=true
+                    continue
+                fi
+                ;;
+            "tap")
+                if [[ "$line" =~ "Would untap:" ]]; then
+                    in_section=true
+                    continue
+                fi
+                ;;
+        esac
+
+        if [[ "$in_section" == true ]]; then
+            # Stop if we hit another section
+            if [[ "$line" =~ ^Would ]]; then
+                break
+            fi
+
+            # Extract package name (remove leading/trailing whitespace)
+            local pkg=$(echo "$line" | xargs)
+            if [[ -n "$pkg" ]]; then
+                packages+=("$pkg")
+            fi
+        fi
+    done <<< "$cleanup_output"
+
+    printf '%s\n' "${packages[@]}"
+}
+
+# Add packages to Brewfile
+add_packages_to_brewfile() {
+    local brewfile="$1"
+    shift
+    local -a packages=("$@")
+
+    if [[ ${#packages[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    print_info "Adding ${#packages[@]} package(s) to Brewfile..."
+
+    for pkg in "${packages[@]}"; do
+        # Determine package type and add with proper syntax
+        if brew list --cask 2>/dev/null | grep -q "^${pkg}$"; then
+            # It's a cask
+            if ! grep -q "cask '${pkg}'" "$brewfile" && ! grep -q "cask \"${pkg}\"" "$brewfile"; then
+                echo "    '${pkg}'," >> "$brewfile"
+                # Insert before the closing bracket of casks array
+                sed -i.bak "/^casks = \[/,/^\]/{
+                    /^\]/i\\
+    '${pkg}',
+                }" "$brewfile" && rm -f "${brewfile}.bak"
+                print_success "Added cask: $pkg"
+            fi
+        elif brew list --formula 2>/dev/null | grep -q "^${pkg}$"; then
+            # It's a formula
+            if ! grep -q "brew '${pkg}'" "$brewfile" && ! grep -q "brew \"${pkg}\"" "$brewfile"; then
+                sed -i.bak "/^brews = \[/,/^\]/{
+                    /^\]/i\\
+    '${pkg}',
+                }" "$brewfile" && rm -f "${brewfile}.bak"
+                print_success "Added formula: $pkg"
+            fi
+        else
+            print_warning "Could not determine type for package: $pkg"
+        fi
+    done
+
+    print_success "Brewfile updated"
+}
+
+# Interactive cleanup with selective package management (Bash 4+ associative arrays)
+interactive_cleanup_packages() {
+    local brewfile="$1"
+    local cleanup_output="$2"
+
+    # Parse packages by type
+    local -a casks=($(parse_cleanup_packages "$cleanup_output" "cask"))
+    local -a formulae=($(parse_cleanup_packages "$cleanup_output" "formula"))
+    local -a taps=($(parse_cleanup_packages "$cleanup_output" "tap"))
+
+    local total_packages=$((${#casks[@]} + ${#formulae[@]} + ${#taps[@]}))
+
+    if [[ $total_packages -eq 0 ]]; then
+        return 0
+    fi
+
+    print_warning "Found $total_packages package(s) not defined in Brewfile"
+    echo ""
+
+    # Use associative arrays for cleaner mapping (Bash 4+)
+    local counter=1
+    declare -A package_map  # Map number to package name
+    declare -A package_type_map  # Map number to package type
+
+    if [[ ${#casks[@]} -gt 0 ]]; then
+        print_info "Casks:"
+        for pkg in "${casks[@]}"; do
+            printf "  %2d) %s\n" "$counter" "$pkg"
+            package_map[$counter]="$pkg"
+            package_type_map[$counter]="cask"
+            ((counter++))
+        done
+        echo ""
+    fi
+
+    if [[ ${#formulae[@]} -gt 0 ]]; then
+        print_info "Formulae:"
+        for pkg in "${formulae[@]}"; do
+            printf "  %2d) %s\n" "$counter" "$pkg"
+            package_map[$counter]="$pkg"
+            package_type_map[$counter]="formula"
+            ((counter++))
+        done
+        echo ""
+    fi
+
+    if [[ ${#taps[@]} -gt 0 ]]; then
+        print_info "Taps:"
+        for pkg in "${taps[@]}"; do
+            printf "  %2d) %s\n" "$counter" "$pkg"
+            package_map[$counter]="$pkg"
+            package_type_map[$counter]="tap"
+            ((counter++))
+        done
+        echo ""
+    fi
+
+    # Prompt user for action
+    echo "What would you like to do with these packages?"
+    echo "  [a] Add selected to Brewfile"
+    echo "  [u] Uninstall selected"
+    echo "  [s] Skip/keep all packages"
+    echo ""
+
+    print_prompt "Enter your choice [a/u/s]:"
+    read -r action_choice
+
+    case "$action_choice" in
+        a|A)
+            print_prompt "Enter package numbers to add (comma-separated, or 'all'):"
+            read -r selection
+
+            local -a to_add=()
+            if [[ "$selection" == "all" ]]; then
+                for key in "${!package_map[@]}"; do
+                    to_add+=("${package_map[$key]}")
+                done
+            else
+                IFS=',' read -ra selections <<< "$selection"
+                for num in "${selections[@]}"; do
+                    num=$(echo "$num" | xargs)  # Trim whitespace
+                    if [[ -n "${package_map[$num]}" ]]; then
+                        to_add+=("${package_map[$num]}")
+                    fi
+                done
+            fi
+
+            if [[ ${#to_add[@]} -gt 0 ]]; then
+                add_packages_to_brewfile "$brewfile" "${to_add[@]}"
+            else
+                print_info "No valid selections made"
+            fi
+            ;;
+        u|U)
+            print_prompt "Enter package numbers to uninstall (comma-separated, or 'all'):"
+            read -r selection
+
+            local -a to_uninstall=()
+            if [[ "$selection" == "all" ]]; then
+                for key in "${!package_map[@]}"; do
+                    to_uninstall+=("${package_map[$key]}")
+                done
+            else
+                IFS=',' read -ra selections <<< "$selection"
+                for num in "${selections[@]}"; do
+                    num=$(echo "$num" | xargs)  # Trim whitespace
+                    if [[ -n "${package_map[$num]}" ]]; then
+                        to_uninstall+=("${package_map[$num]}")
+                    fi
+                done
+            fi
+
+            if [[ ${#to_uninstall[@]} -gt 0 ]]; then
+                print_warning "Uninstalling ${#to_uninstall[@]} package(s)..."
+                if ! brew bundle cleanup --force --file="$brewfile" 2>&1; then
+                    handle_warning "Failed to uninstall some packages" "Try uninstalling manually with 'brew uninstall <package>'"
+                else
+                    print_success "Packages uninstalled successfully"
+                fi
+            else
+                print_info "No valid selections made"
+            fi
+            ;;
+        s|S|*)
+            print_info "Skipped cleanup - packages will remain installed"
+            ;;
+    esac
+
+    echo ""
+}
+
 # Cleanup Homebrew
 cleanup_homebrew() {
     print_info "Cleaning up Homebrew..."
@@ -379,7 +604,7 @@ cleanup_homebrew() {
     fi
 
     # Remove old versions and cleanup cache
-    brew cleanup --prune=30 2>/dev/null || print_error "Cleanup encountered some issues (non-critical)"
+    brew cleanup --prune=30 2>/dev/null || handle_warning "Cleanup encountered some issues" "Check brew cleanup output for details"
 
     # Show cache size
     local cache_size

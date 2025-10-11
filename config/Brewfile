@@ -1,5 +1,9 @@
 # Define packages by type
 casks = [
+    # Terminals
+    'warp',
+    'iterm2',
+
     # Utilities
     'aldente',
     'raycast',
@@ -12,11 +16,8 @@ casks = [
     'rectangle-pro',
     'balenaetcher',
     'music-decoy',
-    'prefs-editor',
+    # 'prefs-editor',
     'logi-options+',
-
-    # CLI Tools
-    'warp',
 
     # Security & Privacy
     '1password',
@@ -35,6 +36,7 @@ casks = [
     'orbstack',
     'expo-orbit',
     'postman',
+    'insomnia',
 
     # Network
     'lulu',
@@ -59,11 +61,13 @@ casks = [
 
     # File Transfer
     'free-download-manager',
+    'transmission',
 
     # Social & Communication
     'discord',
     'telegram',
     'microsoft-teams',
+    'slack',
 
     # Virtualization
     'crossover',
@@ -73,23 +77,70 @@ casks = [
 
     # Productivity
     'notion',
+    'obsidian',
 
     # Gaming
     'steam',
     'epic-games',
     'nvidia-geforce-now',
-    
 ]
 
 brews = [
-    # CLI Tools
+    # Essential - Modern Bash (install first!)
+    'bash',
+
+    # Version Control
+    'git',
     'gh',
-    'bat',
-    'eza',
-    'fnm',
-    'fish',
-    'fastfetch',
-    'mas'
+    'git-delta',
+
+    # Modern CLI replacements
+    'bat',           # Better cat
+    'eza',           # Better ls
+    'ripgrep',       # Better grep
+    'fd',            # Better find
+    'fzf',           # Fuzzy finder
+    'zoxide',        # Better cd
+    'btop',          # Better top
+    'httpie',        # Better curl
+
+    # Development Tools
+    'fnm',           # Fast Node Manager
+    'fish',          # Fish shell
+    'starship',      # Cross-shell prompt
+    'fastfetch',     # System info
+    'mas',           # Mac App Store CLI
+    'jq',            # JSON processor
+    'yq',            # YAML processor
+    'tree',          # Directory tree
+    'wget',          # File downloader
+    'htop',          # Process viewer
+    'watch',         # Execute periodically
+    'tldr',          # Simplified man pages
+
+    # Programming Languages
+    'python',
+    'go',
+    'rust',
+    'lua',
+    'ruby',
+
+    # Databases
+    'postgresql',
+    'mysql',
+    'redis',
+    'sqlite',
+
+    # Build Tools
+    'cmake',
+    'pkg-config',
+    'autoconf',
+    'automake',
+
+    # Compression
+    'p7zip',
+    'unzip',
+    'zstd',
 ]
 
 mas = [

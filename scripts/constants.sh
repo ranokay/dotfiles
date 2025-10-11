@@ -4,7 +4,7 @@
 # This file contains all configuration constants used across the dotfiles scripts
 
 # Version
-readonly DOTFILES_VERSION="2.0.0"
+readonly DOTFILES_VERSION="3.0.0"
 
 # Paths
 readonly DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
@@ -31,13 +31,6 @@ readonly GIT_SIGNING_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGOlQ9WC58WUVNYtM0
 
 # macOS System Configuration
 readonly SYSTEM_NAME="mbp"
-
-# Revalidation Times (in seconds)
-readonly REVALIDATE_HOMEPAGE=600      # 10 minutes
-readonly REVALIDATE_POSTS=3600        # 60 minutes
-readonly REVALIDATE_CATEGORIES=1800   # 30 minutes
-readonly REVALIDATE_ACF=1800          # 30 minutes
-readonly REVALIDATE_SEARCH=18000      # 5 hours
 
 # Shell Configurations
 readonly OH_MY_ZSH_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"

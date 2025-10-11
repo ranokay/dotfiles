@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "./scripts/utils.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 # Function to check if git config matches expected value
 check_git_config() {
@@ -45,9 +45,35 @@ configure_git() {
     local op_ssh_sign_path
     if [[ "$(uname)" == "Darwin" ]]; then
         op_ssh_sign_path="/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+        # Validate 1Password installation
+        if [[ ! -f "$op_ssh_sign_path" ]]; then
+            handle_warning "1Password SSH signing program not found at expected location" "Install 1Password from https://1password.com or update the path in scripts/git.sh"
+
+            # Check if 1Password is installed elsewhere
+            if [[ -d "/Applications/1Password.app" ]]; then
+                print_info "1Password app found but SSH signing binary is missing"
+            else
+                print_info "1Password app not installed - commit signing will not work"
+            fi
+
+            # Ask user if they want to continue without 1Password
+            if ! prompt_with_default "Continue without 1Password SSH signing?" "n"; then
+                handle_error 1 "1Password SSH signing required but not available" "false" "Install 1Password or disable commit signing"
+                return 1
+            else
+                print_info "Skipping 1Password SSH signing configuration"
+                return 0
+            fi
+        fi
     else
         # Assuming Linux path from your Nix configuration
-        op_ssh_sign_path="$(which 1password-gui)/bin/op-ssh-sign"
+        op_ssh_sign_path="$(which 1password-gui 2>/dev/null)/bin/op-ssh-sign"
+
+        if [[ ! -f "$op_ssh_sign_path" ]]; then
+            handle_warning "1Password not found on Linux system" "Install 1Password or configure SSH signing manually"
+            return 0
+        fi
     fi
 
     set_git_config "gpg.ssh.program" "$op_ssh_sign_path" "SSH signing program"

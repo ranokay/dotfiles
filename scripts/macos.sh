@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "./scripts/utils.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/utils.sh"
 
 # Config from https://mths.be/macos
 
@@ -116,7 +116,16 @@ set_system_config() {
         if [[ "$DRY_RUN" == "true" ]]; then
             print_dry_run "Would update $description ($config_type = $value)"
         else
-            sudo scutil --set "$config_type" "$value"
+            # Prompt for critical system name changes
+            if ! prompt_with_default "Change $description to '$value'?" "y"; then
+                print_info "Skipped: $description"
+                return 0
+            fi
+
+            if ! sudo scutil --set "$config_type" "$value" 2>&1; then
+                handle_error 1 "Failed to update $description" "true" "Check if you have administrator privileges"
+                return 1
+            fi
             print_success "Updated $description"
         fi
     fi

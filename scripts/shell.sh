@@ -333,8 +333,18 @@ configure_zsh() {
             print_dry_run "Would install Oh My Zsh"
         else
             print_info "Installing Oh My Zsh..."
-            RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-            print_success "Oh My Zsh installed"
+
+            # Check if git is available
+            if ! command_exists git; then
+                handle_error 1 "Git is required to install Oh My Zsh" "false" "Install Git first: brew install git"
+                return 1
+            fi
+
+            if ! RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 2>&1; then
+                handle_error 1 "Failed to install Oh My Zsh" "true" "Check your internet connection or install manually"
+            else
+                print_success "Oh My Zsh installed"
+            fi
         fi
     fi
 
@@ -345,8 +355,11 @@ configure_zsh() {
             print_dry_run "Would install Powerlevel10k theme"
         else
             print_info "Installing Powerlevel10k theme..."
-            git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir"
-            print_success "Powerlevel10k installed"
+            if ! git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$p10k_dir" 2>&1; then
+                handle_warning "Failed to install Powerlevel10k theme" "Install it manually or check your internet connection"
+            else
+                print_success "Powerlevel10k installed"
+            fi
         fi
     fi
 
@@ -368,8 +381,11 @@ configure_zsh() {
                 print_dry_run "Would install plugin: $plugin_name"
             else
                 print_info "Installing plugin: $plugin_name"
-                git clone "$plugin_url" "$plugin_dir"
-                print_success "Plugin installed: $plugin_name"
+                if ! git clone "$plugin_url" "$plugin_dir" 2>&1; then
+                    handle_warning "Failed to install plugin: $plugin_name" "Install it manually or check your internet connection"
+                else
+                    print_success "Plugin installed: $plugin_name"
+                fi
             fi
         fi
     done
