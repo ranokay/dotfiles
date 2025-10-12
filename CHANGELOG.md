@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - 2025-10-11
+## [3.0.0] - 2025-10-12
 
 ### Breaking Changes
 
@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All functionality previously in legacy scripts is available through `setup.sh` modules
 
 ### Added
+
+#### 🔧 **New Modular Workflow**
+
+- **`cli` module** - Install essential CLI tools (modern Bash & Git) first
+  - Installs Bash 5+ and Git from Homebrew
+  - Works with your existing shell (Zsh) - doesn't change default shell
+  - Scripts automatically use newer Bash via PATH after terminal restart
+- **`symlinks` module** - Create symlinks for dotfiles
+  - Links `.zshrc` from `config/` directory
+  - Backs up existing files automatically
+  - Easy to extend for additional dotfiles
+- **Recommended workflow**: `cli` → restart terminal → `symlinks` → `brew` → rest
 
 #### 🎯 **Interactive Package Management**
 

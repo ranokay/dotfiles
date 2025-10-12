@@ -61,28 +61,37 @@ A comprehensive, production-ready dotfiles repository for automating macOS devel
 
 ### Fresh macOS Installation
 
-For a brand new Mac, run the full setup:
+For a brand new Mac, follow this recommended workflow:
 
 ```bash
 # Clone the repository
 git clone https://github.com/ranokay/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
-# Run full setup (installs Xcode CLI tools, Homebrew, all packages, and configures macOS)
-./setup.sh
+# Step 1: Install essential CLI tools (Bash & Git)
+./setup.sh cli
 
-# After Homebrew installs modern Bash, switch to it (optional but recommended)
-# For Intel Macs:
-echo '/usr/local/bin/bash' | sudo tee -a /etc/shells
-chsh -s /usr/local/bin/bash
+# Step 2: Restart your terminal to use the new shell
 
-# For Apple Silicon Macs:
-echo '/opt/homebrew/bin/bash' | sudo tee -a /etc/shells
-chsh -s /opt/homebrew/bin/bash
+# Step 3: Create symlinks for dotfiles
+./setup.sh symlinks
 
-# Restart terminal, then re-run with modern Bash for optimal experience
-./setup.sh
+# Step 4: Install all packages from Brewfile
+./setup.sh brew
+
+# Step 5: Configure the rest of the system
+./setup.sh git shell macos-*
 ```
+
+**Why this order?**
+
+- `cli` installs modern Bash & Git from Homebrew
+- After terminal restart, scripts use the newer versions via PATH
+- `symlinks` creates links for `.zshrc` and other dotfiles
+- `brew` installs all packages with modern Bash features enabled
+- Everything else configures your system with optimal tooling
+
+**Note:** This doesn't change your default shell (you'll keep using Zsh). Scripts will automatically use the newer Bash version via `#!/usr/bin/env bash` because `/opt/homebrew/bin` is in your PATH.
 
 ### Existing macOS Installation
 
@@ -178,6 +187,8 @@ ENABLE_BACKUP=false ./setup.sh
 | Module | Description |
 |--------|-------------|
 | `checks` | System validation (macOS version, Xcode CLI) |
+| `cli` | Install essential CLI tools (modern Bash & Git) |
+| `symlinks` | Create symlinks for dotfiles (.zshrc, etc.) |
 | `brew` | Homebrew and package management |
 | `git` | Git configuration with 1Password signing |
 | `shell` | Shell setup (zsh, fish, Oh My Zsh) |

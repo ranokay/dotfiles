@@ -30,7 +30,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/scripts/utils.sh"
 
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ALL_MODULES=("checks" "brew" "git" "shell" "macos-general" "macos-input" "macos-screen" "macos-finder" "macos-dock" "macos-apps")
+ALL_MODULES=("checks" "cli" "symlinks" "brew" "git" "shell" "macos-general" "macos-input" "macos-screen" "macos-finder" "macos-dock" "macos-apps")
 
 # Parse command line arguments
 usage() {
@@ -51,9 +51,11 @@ OPTIONS:
 
 MODULES:
     checks              System validation (macOS version, Xcode CLI tools)
+    cli                 Install Bash & Git from Homebrew (doesn't change default shell)
+    symlinks            Create symlinks for dotfiles (.zshrc, etc.)
     brew                Homebrew and package installation
     git                 Git configuration with 1Password signing
-    shell               Shell configuration (zsh, fish, dotfile linking)
+    shell               Shell configuration (zsh, fish, Oh My Zsh)
     macos-general       General macOS UI/UX settings
     macos-input         Input device configuration
     macos-screen        Screen and screenshot settings
@@ -62,7 +64,8 @@ MODULES:
     macos-apps          Application-specific settings
 
 EXAMPLES:
-    $0                          # Run full setup
+    $0 cli symlinks brew        # Recommended: Install CLI tools, symlinks, then packages
+    $0                          # Run full setup (all modules)
     $0 --dry-run                # Show what would be changed
     $0 brew git                 # Only install packages and configure Git
     $0 --dry-run macos-dock     # Preview Dock changes
@@ -78,6 +81,12 @@ list_modules() {
             "checks")
                 echo "  $module        - System validation (macOS version, Xcode CLI tools)"
                 ;;
+            "cli")
+                echo "  $module           - Install Bash & Git from Homebrew (doesn't change default shell)"
+                ;;
+            "symlinks")
+                echo "  $module      - Create symlinks for dotfiles (.zshrc, etc.)"
+                ;;
             "brew")
                 echo "  $module          - Homebrew and package installation"
                 ;;
@@ -85,7 +94,7 @@ list_modules() {
                 echo "  $module           - Git configuration with 1Password signing"
                 ;;
             "shell")
-                echo "  $module         - Shell configuration (zsh, fish, dotfile linking)"
+                echo "  $module         - Shell configuration (zsh, fish, Oh My Zsh)"
                 ;;
             "macos-general")
                 echo "  $module   - General macOS UI/UX settings"
@@ -247,6 +256,16 @@ for module in "${SELECTED_MODULES[@]}"; do
             else
                 print_info "Skipping system checks"
             fi
+            ;;
+        "cli")
+            source "$SCRIPT_DIR/scripts/cli.sh"
+            install_essential_cli
+            print_success "✓ Module '$module' completed"
+            ;;
+        "symlinks")
+            source "$SCRIPT_DIR/scripts/symlinks.sh"
+            create_symlinks
+            print_success "✓ Module '$module' completed"
             ;;
         "brew")
             source "$SCRIPT_DIR/scripts/brew.sh"
